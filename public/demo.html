@@ -1437,21 +1437,7 @@
             if (e.key === 'Enter') applyFilters();
         });
 
-        // Initial load
-        loadCategories();
-        loadRecipes();
-        
-        // Load dashboard components after a short delay to ensure DOM is ready
-        setTimeout(() => {
-            loadHealthCheck().catch(e => console.error('Health check failed:', e));
-            loadStats().catch(e => console.error('Stats failed:', e));
-            loadDeletedRecipes().catch(e => console.error('Deleted recipes failed:', e));
-        }, 500);
-        
-        // Start carousel after initial load
-        setTimeout(startCarousel, 2000);
-
-        // Dashboard functions
+        // Dashboard functions (defined before initial load)
         const loadHealthCheck = async () => {
             const statusEl = document.getElementById('health-status');
             const uptimeEl = document.getElementById('health-uptime');
@@ -1617,6 +1603,20 @@
                 showToast(e.message, 'error');
             }
         };
+
+        // Initial load
+        loadCategories();
+        loadRecipes();
+        
+        // Load dashboard components after a short delay to ensure DOM is ready
+        setTimeout(() => {
+            loadHealthCheck().catch(e => console.error('Health check failed:', e));
+            loadStats().catch(e => console.error('Stats failed:', e));
+            loadDeletedRecipes().catch(e => console.error('Deleted recipes failed:', e));
+        }, 500);
+        
+        // Start carousel after initial load
+        setTimeout(startCarousel, 2000);
     </script>
 </body>
 </html>

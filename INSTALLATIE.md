@@ -1,8 +1,41 @@
 # Recipe Manager API - Installatie Instructies
 
-## ⚡ Quick Start
+Een volledige gids voor het installeren en configureren van de Recipe Manager API.
 
-### 1. Environment Configuratie
+## Vereisten
+
+Zorg ervoor dat je het volgende hebt geïnstalleerd op je systeem:
+
+- **Node.js**: versie 20.0.0 of hoger ([download](https://nodejs.org))
+  ```bash
+  node --version  # Controleer versie
+  ```
+- **npm**: wordt meegeleverd met Node.js
+  ```bash
+  npm --version
+  ```
+- **MySQL Database** (een van de volgende opties):
+  - Lokale MySQL server ([download](https://dev.mysql.com/downloads/mysql/))
+  - Cloud provider zoals Aiven, AWS RDS of Google Cloud SQL
+
+## Quick Start
+
+### 1. Repository Clonen
+
+```bash
+git clone <repository-url>
+cd backend-web-api
+```
+
+### 2. Dependencies Installeren
+
+```bash
+npm install
+```
+
+Dit installeert alle benodigde packages (Express, MySQL2, dotenv, express-validator, etc.)
+
+### 3. Environment Configuratie
 
 Pas het `.env` bestand aan met jouw MySQL credentials:
 
@@ -64,60 +97,60 @@ Open je browser en ga naar:
 
 ## 📋 Checklist Project Requirements
 
-### ✅ Functionele Minimum Requirements
+## Project Requirements
 
-- [x] **Twee CRUD interfaces**
+### Functionele Minimum Requirements
+
+- **Twee CRUD interfaces**
   - Recipes: GET lijst, GET detail, POST, PUT, DELETE
   - Categories: GET lijst, GET detail, POST, PUT, DELETE
 
-- [x] **Basisvalidatie**
+- **Basisvalidatie**
   - Velden mogen niet leeg zijn
   - Numerieke velden accepteren geen strings
   - Formaat validatie (geen cijfers in namen)
 
-- [x] **Pagination endpoint**
+- **Pagination endpoint**
   - `GET /api/recipes?limit=10&offset=0`
   - `GET /api/categories?limit=50&offset=0`
 
-- [x] **Zoeken endpoint**
+- **Zoeken endpoint**
   - `GET /api/recipes?search=pasta`
   - Zoekt in title, description en ingredients
 
-- [x] **Root documentatie**
+- **Root documentatie**
   - Volledige HTML pagina op http://localhost:3000
   - Beschrijft alle endpoints met voorbeelden
 
-### ✨ Extra Features
+### Extra Features
 
-- [x] **Geavanceerde validatie**
+- **Geavanceerde validatie**
   - Unieke constraint: category namen moeten uniek zijn
   - Relatie validatie: category met recipes kan niet verwijderd
   - Custom logic: totale tijd (prep + cook) moet minimaal 1 minuut
 
-- [x] **Zoeken op meerdere velden**
+- **Zoeken op meerdere velden**
   - Search parameter zoekt in 3 velden: title, description, ingredients
 
-- [x] **Resultaten sorteren**
+- **Resultaten sorteren**
   - Sort op: title, prep_time, cook_time, created_at, servings
   - Order: asc of desc
-  - Voorbeeld: `GET /api/recipes?sort=prep_time&order=asc`
 
-- [x] **Advanced filtering**
-  - Filter op difficulty: `?difficulty=easy`
-  - Filter op category: `?category_id=1`
-  - Combineer filters: `?difficulty=easy&category_id=1&search=kip`
+- **Advanced filtering**
+  - Filter op difficulty en category_id
+  - Combineer meerdere filters
 
-- [x] **Extra endpoints**
+- **Extra endpoints**
   - `GET /api/categories/:id/recipes` - Alle recipes van een category
 
-### ✅ Technische Requirements
+### Technische Requirements
 
-- [x] Node.js versie 20+
-- [x] Express framework
-- [x] MySQL database connectie
-- [x] Juiste HTTP verbs (GET, POST, PUT, DELETE)
+- Node.js versie 20+
+- Express framework
+- MySQL database connectie
+- Juiste HTTP verbs (GET, POST, PUT, DELETE)
 
-## 🧪 Test Voorbeelden
+## Test Voorbeelden
 
 ### Recipes Testen
 
@@ -178,92 +211,86 @@ curl -X POST http://localhost:3000/api/categories \
   }'
 ```
 
-## 📁 Project Architectuur
+## Project Architectuur
 
 ```
 MVC Pattern + Validators:
 
-┌─────────────┐
-│   Routes    │  → Definiëren endpoints en HTTP methods
-└──────┬──────┘
-       │
-┌──────▼──────┐
-│ Validators  │  → Valideren input data
-└──────┬──────┘
-       │
-┌──────▼──────┐
-│ Controllers │  → Behandelen business logic
-└──────┬──────┘
-       │
-┌──────▼──────┐
-│   Models    │  → Database queries
-└──────┬──────┘
-       │
-┌──────▼──────┐
-│   MySQL     │  → Data opslag
-└─────────────┘
+Routes → Validators → Controllers → Models → MySQL
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Database connectie mislukt?
-- Check of MySQL server draait
-- Controleer credentials in `.env`
-- Test connectie: `mysql -u root -p` in terminal
+**Symptomen:** `Error: connect ECONNREFUSED 127.0.0.1:3306`
 
-### Server start niet?
-- Check of poort 3000 vrij is
-- Kijk naar error messages in de terminal
-- Controleer of alle dependencies geïnstalleerd zijn: `npm install`
+**Oplossingen:**
+- Controleer of MySQL server draait:
+  - Windows: Check Services app (services.msc)
+  - Mac: Controleer in System Preferences > MySQL
+  - Linux: `sudo service mysql status`
+- Verifieer credentials in `.env` bestand
+- Test connectie handmatig: `mysql -h localhost -u root -p`
+- Controleer DB_PORT (default: 3306)
 
-### Validatie errors?
-- Check de API documentatie op http://localhost:3000
-- Kijk naar de required/optional badges bij parameters
-- Test met de voorbeelden in de documentatie
+### Server start niet op poort 3000?
+**Symptomen:** `EADDRINUSE: address already in use :::3000`
+
+**Oplossingen:**
+- Wijzig PORT in `.env` naar bijvoorbeeld 3001
+- Of stop het programma dat poort 3000 gebruikt:
+  - Windows: `netstat -ano | findstr :3000` en kill het process ID
+  - Mac/Linux: `lsof -i :3000` en kill het process
+
+### Setup script werkt niet?
+- Zorg dat `.env` correct ingesteld is
+- Controleer databasenaam in `.env`
+- Run met verbose output: `node setup-database.js --debug`
+- Check MySQL user rechten (CREATE, INSERT)
 
 ## 📊 Database Schema
 
 **Recipes Table:**
-- id (INT, PRIMARY KEY)
-- title (VARCHAR 200)
-- description (TEXT)
-- ingredients (TEXT)
-- instructions (TEXT)
-- prep_time (INT)
-- cook_time (INT)
-- servings (INT)
-- difficulty (ENUM: easy, medium, hard)
-- category_id (INT, FOREIGN KEY)
-- created_at (TIMESTAMP)
-- updated_at (TIMESTAMP)
+```sql
+CREATE TABLE recipes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(200) NOT NULL,
+  description TEXT,
+  ingredients TEXT NOT NULL,
+  instructions TEXT NOT NULL,
+  prep_time INT NOT NULL,
+  cook_time INT NOT NULL,
+  servings INT NOT NULL,
+  difficulty ENUM('easy', 'medium', 'hard') DEFAULT 'medium',
+  category_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+```
 
 **Categories Table:**
-- id (INT, PRIMARY KEY)
-- name (VARCHAR 100, UNIQUE)
-- description (TEXT)
-- created_at (TIMESTAMP)
-- updated_at (TIMESTAMP)
+```sql
+CREATE TABLE categories (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL UNIQUE,
+  description VARCHAR(500),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+```
 
-**Relatie:**
-- Recipes.category_id → Categories.id (ON DELETE SET NULL)
+## Code Kwaliteit
 
-## ✅ Code Kwaliteit Features
+- Error Handling: Try-catch blocks in controllers
+- Logging: Console logs voor debugging
+- Validatie: Express-validator input validatie
+- Security: Prepared statements (SQL injection preventie)
+- Code Structuur: MVC pattern
+- Documentation: Inline comments met bronvermelding
+- Environment Variables: Gevoelige data in .env
 
-- **Error Handling**: Try-catch blocks in alle controllers
-- **Logging**: Console logs voor debugging
-- **Validatie**: Express-validator voor input validatie
-- **Security**: Prepared statements (SQL injection preventie)
-- **Code Structuur**: MVC pattern
-- **Documentation**: Inline comments met bronvermelding
-- **Environment Variables**: Gevoelige data in .env
+## Licentie & Contact
 
-## 🎓 Bronvermelding in Code
-
-Alle externe code is voorzien van bronvermelding:
-- Connection pooling: MySQL2 documentatie
-- Validation middleware: Express-validator documentatie
-- Best practices: Node.js community guidelines
-
-Zie comments in de code voor specifieke bronnen.
-
----
+Dit project is gemaakt als onderdeel van het schoolprogramma.
+Voor vragen of problemen: Raadpleeg de projectdocumentatie of contacteer de docent.

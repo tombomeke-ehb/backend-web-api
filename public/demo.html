@@ -1003,14 +1003,14 @@
         const CAROUSEL_INTERVAL = 8000; // 8 seconds between shuffles
 
         // Utility functions
-        const showToast = (message, type = '') => {
+        function showToast(message, type = '') {
             toast.textContent = message;
             toast.className = `toast ${type}`;
             setTimeout(() => toast.classList.add('show'), 10);
             setTimeout(() => toast.classList.remove('show'), 3000);
-        };
+        }
 
-        const scrollToSection = (id) => {
+        function scrollToSection(id) {
             // Update active nav link
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
             const activeLink = document.querySelector(`a[href="#${id}"]`);
@@ -1018,15 +1018,15 @@
             
             // Scroll to section
             document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        };
+        }
 
-        const difficultyBadge = (level) => {
+        function difficultyBadge(level) {
             const labels = { easy: 'Makkelijk', medium: 'Gemiddeld', hard: 'Moeilijk' };
             return `<span class="badge badge-${level}">${labels[level] || level}</span>`;
-        };
+        }
 
         // Emoji mapping based on recipe title keywords
-        const getRecipeEmoji = (title, categoryName) => {
+        function getRecipeEmoji(title, categoryName) {
             const t = title.toLowerCase();
             const c = (categoryName || '').toLowerCase();
             
@@ -1077,7 +1077,7 @@
             // Random fallback
             const fallbacks = ['🍽️', '👨‍🍳', '🥄', '🍴'];
             return fallbacks[Math.floor(Math.random() * fallbacks.length)];
-        };
+        }
 
         const categoryIcons = { 
             'ontbijt': '🍳', 
@@ -1087,21 +1087,21 @@
             'vegetarisch': '🥬', 
             'vegan': '🌱' 
         };
-        const getCategoryIcon = (name) => {
+        function getCategoryIcon(name) {
             const n = (name || '').toLowerCase();
             return categoryIcons[n] || '🍽️';
-        };
+        }
 
         // API calls
-        const fetchAPI = async (url, options = {}) => {
+        async function fetchAPI(url, options = {}) {
             const res = await fetch(url, options);
             const json = await res.json();
             if (!res.ok) throw new Error(json.message || 'Er ging iets mis');
             return json;
-        };
+        }
 
         // Load categories
-        const loadCategories = async () => {
+        async function loadCategories() {
             try {
                 const json = await fetchAPI(`${API}/categories`);
                 const cats = json.data || [];
@@ -1135,10 +1135,10 @@
                     <div class="empty-state-text">Kon categorieën niet laden</div>
                 </div>`;
             }
-        };
+        }
 
         // Load recipes
-        const loadRecipes = async (filters = {}, shuffle = false) => {
+        async function loadRecipes(filters = {}, shuffle = false) {
             // Add shuffle animation
             if (shuffle) {
                 const cards = recipeGrid.querySelectorAll('.recipe-card');
@@ -1204,10 +1204,10 @@
                     <div class="empty-state-text">${e.message}</div>
                 </div>`;
             }
-        };
+        }
 
         // Filter functions
-        const applyFilters = () => {
+        function applyFilters() {
             const filters = {};
             const search = document.getElementById('search').value.trim();
             const difficulty = document.getElementById('difficulty').value;
@@ -1220,16 +1220,16 @@
             if (sort) filters.sort = sort;
 
             loadRecipes(filters);
-        };
+        }
 
-        const filterByCategory = (catId) => {
+        function filterByCategory(catId) {
             document.getElementById('category').value = catId;
             applyFilters();
             scrollToSection('recipes');
-        };
+        }
 
         // Open recipe modal
-        const openRecipe = async (id) => {
+        async function openRecipe(id) {
             try {
                 const json = await fetchAPI(`${API}/recipes/${id}`);
                 const r = json.data;
@@ -1274,11 +1274,11 @@
             } catch (e) {
                 showToast(e.message, 'error');
             }
-        };
+        }
 
-        const closeModal = () => {
+        function closeModal() {
             modalBackdrop.style.display = 'none';
-        };
+        }
 
         modalBackdrop.addEventListener('click', (e) => {
             if (e.target === modalBackdrop) closeModal();
@@ -1404,20 +1404,20 @@
         };
 
         // Carousel functions
-        const shuffleRecipes = () => {
+        function shuffleRecipes() {
             loadRecipes({}, true);
-        };
+        }
         
-        const startCarousel = () => {
+        function startCarousel() {
             if (carouselInterval) clearInterval(carouselInterval);
             carouselInterval = setInterval(() => {
                 if (!carouselPaused) {
                     shuffleRecipes();
                 }
             }, CAROUSEL_INTERVAL);
-        };
+        }
         
-        const toggleCarousel = () => {
+        function toggleCarousel() {
             carouselPaused = !carouselPaused;
             carouselIndicator.classList.toggle('paused', carouselPaused);
             carouselToggle.innerHTML = carouselPaused 
@@ -1425,7 +1425,7 @@
                 : '<span>⏸️</span> Pauze';
             
             showToast(carouselPaused ? 'Auto-wissel gepauzeerd' : 'Auto-wissel hervat', 'success');
-        };
+        }
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {

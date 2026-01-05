@@ -14,63 +14,94 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             line-height: 1.6;
-            color: #333;
+            color: #2c3e50;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-            background: #f5f5f5;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
         }
         
         header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 40px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 50px 40px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+            text-align: center;
         }
         
         h1 {
-            font-size: 2.5em;
+            font-size: 2.8em;
             margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.95;
         }
         
         h2 {
             color: #667eea;
-            margin: 30px 0 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #667eea;
+            margin: 40px 0 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #667eea;
+            font-weight: 600;
+            font-size: 1.8em;
         }
         
         h3 {
             color: #764ba2;
-            margin: 20px 0 10px;
+            margin: 20px 0 12px;
+            font-weight: 600;
+        }
+        
+        h4 {
+            color: #555;
+            margin: 15px 0 10px;
+            font-weight: 600;
         }
         
         .intro {
             background: white;
-            padding: 25px;
-            border-radius: 8px;
+            padding: 30px;
+            border-radius: 10px;
             margin-bottom: 30px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid #667eea;
+        }
+        
+        .intro p {
+            margin: 10px 0;
         }
         
         .endpoint {
             background: white;
-            padding: 20px;
+            padding: 25px;
             margin-bottom: 20px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .endpoint:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
         }
         
         .method {
             display: inline-block;
-            padding: 5px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            margin-right: 10px;
+            padding: 6px 14px;
+            border-radius: 5px;
+            font-weight: 700;
+            margin-right: 12px;
             font-size: 0.85em;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
         
         .get { background: #61affe; color: white; }
@@ -80,16 +111,19 @@
         
         .url {
             font-family: 'Courier New', monospace;
-            background: #f0f0f0;
-            padding: 8px 12px;
-            border-radius: 4px;
+            background: #f5f7fa;
+            padding: 10px 14px;
+            border-radius: 6px;
             display: inline-block;
-            margin: 10px 0;
+            margin: 12px 0;
+            color: #667eea;
+            font-weight: 600;
         }
         
         .description {
             margin: 15px 0;
             color: #555;
+            line-height: 1.7;
         }
         
         .params, .response {
@@ -97,53 +131,65 @@
         }
         
         .params h4, .response h4 {
-            color: #666;
-            font-size: 0.95em;
-            margin-bottom: 8px;
+            color: #667eea;
+            font-size: 0.98em;
+            margin-bottom: 10px;
+            font-weight: 600;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 10px 0;
-            background: #fafafa;
+            background: #fafbfc;
+            border-radius: 8px;
+            overflow: hidden;
         }
         
         th, td {
-            padding: 10px;
+            padding: 12px 14px;
             text-align: left;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e8ecf1;
         }
         
         th {
-            background: #f0f0f0;
-            font-weight: 600;
-            color: #555;
+            background: #f0f4f8;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
         }
         
         code {
-            background: #f0f0f0;
-            padding: 2px 6px;
-            border-radius: 3px;
+            background: #f5f7fa;
+            padding: 3px 8px;
+            border-radius: 4px;
             font-family: 'Courier New', monospace;
             font-size: 0.9em;
+            color: #d73a49;
         }
         
         pre {
             background: #2d2d2d;
             color: #f8f8f2;
-            padding: 15px;
-            border-radius: 6px;
+            padding: 18px;
+            border-radius: 8px;
             overflow-x: auto;
             margin: 10px 0;
+            font-size: 0.9em;
+            line-height: 1.5;
         }
         
         .badge {
             display: inline-block;
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 0.8em;
-            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
         
         .required { background: #ffe0e0; color: #c00; }
@@ -151,17 +197,21 @@
         
         footer {
             text-align: center;
-            margin-top: 50px;
-            padding: 20px;
+            margin-top: 60px;
+            padding: 30px;
             color: #777;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         }
         
         .feature-list {
             background: white;
-            padding: 20px;
-            border-radius: 8px;
+            padding: 25px;
+            border-radius: 10px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid #764ba2;
         }
         
         .feature-list ul {
@@ -170,13 +220,90 @@
         }
         
         .feature-list li {
-            margin: 8px 0;
+            margin: 10px 0;
+            line-height: 1.7;
+        }
+
+        .demo-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid #49cc90;
+        }
+
+        .demo-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .demo-btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .demo-get { background: #61affe; color: white; }
+        .demo-post { background: #49cc90; color: white; }
+        .demo-get:hover { background: #4fa3e0; }
+        .demo-post:hover { background: #3db86d; }
+
+        .demo-output {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .demo-loading {
+            color: #fca130;
+            font-weight: 600;
+        }
+
+        .demo-success {
+            color: #49cc90;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .demo-error {
+            color: #f93e3e;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.4em; }
+            header { padding: 30px 20px; }
+            .demo-buttons { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>🍳 Recipe Manager API</h1>
+        <h1>Recipe Manager API</h1>
         <p>Een database-driven REST API gebouwd met Node.js, Express en MySQL</p>
     </header>
 
@@ -184,23 +311,56 @@
         <h2>Welkom bij de Recipe Manager API</h2>
         <p>Deze API stelt je in staat om recepten en categorieën te beheren. Alle responses zijn in JSON formaat.</p>
         <p><strong>Base URL:</strong> <code>http://localhost:3000/api</code></p>
+        <p><strong>Live demo:</strong> open <a href="/demo">/demo</a> om de API in actie te zien.</p>
     </div>
 
     <div class="feature-list">
-        <h2>✨ Features</h2>
+        <h2>Features</h2>
         <ul>
-            <li>✅ Volledige CRUD operaties voor Recipes en Categories</li>
-            <li>✅ Uitgebreide validatie van input data</li>
-            <li>✅ Pagination met limit en offset parameters</li>
-            <li>✅ Zoeken in meerdere velden (titel, beschrijving, ingrediënten)</li>
-            <li>✅ Filtering op difficulty en category</li>
-            <li>✅ Sorteren op verschillende velden (tijd, naam, datum)</li>
-            <li>✅ Geavanceerde validatie (unieke namen, relatie checks)</li>
-            <li>✅ Recipe count per category</li>
+            <li>Volledige CRUD operaties voor Recipes en Categories</li>
+            <li>Uitgebreide validatie van input data</li>
+            <li>Pagination met limit en offset parameters</li>
+            <li>Zoeken in meerdere velden (titel, beschrijving, ingrediënten)</li>
+            <li>Filtering op difficulty en category</li>
+            <li>Sorteren op verschillende velden (tijd, naam, datum)</li>
+            <li>Geavanceerde validatie (unieke namen, relatie checks)</li>
+            <li>Recipe count per category</li>
         </ul>
     </div>
 
-    <h2>📚 Recipes Endpoints</h2>
+    <h2>Interactieve API Demo</h2>
+
+    <div class="demo-section">
+        <h3>Test de API endpoints direct hier:</h3>
+        <p><strong>Opmerking:</strong> De server moet draaien op http://localhost:3000</p>
+        
+        <div>
+            <h4>Recipes ophalen (GET)</h4>
+            <div class="demo-buttons">
+                <button class="demo-btn demo-get" onclick="testGetRecipes()">Alle Recipes laden</button>
+                <button class="demo-btn demo-get" onclick="testGetRecipeById()">Recipe met ID 1</button>
+            </div>
+            <div id="demo-output-recipes" class="demo-output" style="display:none;"></div>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <h4>Categories ophalen (GET)</h4>
+            <div class="demo-buttons">
+                <button class="demo-btn demo-get" onclick="testGetCategories()">Alle Categories laden</button>
+            </div>
+            <div id="demo-output-categories" class="demo-output" style="display:none;"></div>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <h4>Nieuwe Recipe aanmaken (POST)</h4>
+            <div class="demo-buttons">
+                <button class="demo-btn demo-post" onclick="testCreateRecipe()">Test POST - Recipe maken</button>
+            </div>
+            <div id="demo-output-post" class="demo-output" style="display:none;"></div>
+        </div>
+    </div>
+
+    <h2>Recipes Endpoints</h2>
 
     <div class="endpoint">
         <h3><span class="method get">GET</span> Alle recipes ophalen</h3>
@@ -447,7 +607,7 @@
         </div>
     </div>
 
-    <h2>📂 Categories Endpoints</h2>
+    <h2>Categories Endpoints</h2>
 
     <div class="endpoint">
         <h3><span class="method get">GET</span> Alle categories ophalen</h3>
@@ -570,7 +730,7 @@
         </div>
     </div>
 
-    <h2>🔍 Voorbeelden</h2>
+    <h2>Voorbeelden</h2>
 
     <div class="feature-list">
         <h3>Zoeken en filteren van recipes:</h3>
@@ -584,7 +744,7 @@
         </ul>
     </div>
 
-    <h2>⚠️ Error Responses</h2>
+    <h2>Error Responses</h2>
 
     <div class="feature-list">
         <p>Alle errors volgen dit formaat:</p>
@@ -609,7 +769,7 @@
         </ul>
     </div>
 
-    <h2>💡 Validatie Regels</h2>
+    <h2>Validatie Regels</h2>
 
     <div class="feature-list">
         <h3>Recipes:</h3>
@@ -636,5 +796,92 @@
         <p>Recipe Manager API v1.0.0 | Gemaakt met Node.js, Express en MySQL</p>
         <p>Voor vragen of problemen, neem contact op met de ontwikkelaar</p>
     </footer>
+
+    <script>
+        function formatJSON(json) {
+            return JSON.stringify(json, null, 2);
+        }
+
+        function showOutput(elementId, content, isError = false) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.innerHTML = content;
+        }
+
+        async function testGetRecipes() {
+            const outputId = 'demo-output-recipes';
+            showOutput(outputId, '<span class="demo-loading">Bezig met laden...</span>');
+            
+            try {
+                const response = await fetch('/api/recipes?limit=3');
+                const data = await response.json();
+                showOutput(outputId, '<span class="demo-success">Succes!</span>\n' + formatJSON(data));
+            } catch (error) {
+                showOutput(outputId, '<span class="demo-error">Fout: ' + error.message + '</span>', true);
+            }
+        }
+
+        async function testGetRecipeById() {
+            const outputId = 'demo-output-recipes';
+            showOutput(outputId, '<span class="demo-loading">Bezig met laden...</span>');
+            
+            try {
+                const response = await fetch('/api/recipes/1');
+                const data = await response.json();
+                showOutput(outputId, '<span class="demo-success">Succes!</span>\n' + formatJSON(data));
+            } catch (error) {
+                showOutput(outputId, '<span class="demo-error">Fout: ' + error.message + '</span>', true);
+            }
+        }
+
+        async function testGetCategories() {
+            const outputId = 'demo-output-categories';
+            showOutput(outputId, '<span class="demo-loading">Bezig met laden...</span>');
+            
+            try {
+                const response = await fetch('/api/categories');
+                const data = await response.json();
+                showOutput(outputId, '<span class="demo-success">Succes!</span>\n' + formatJSON(data));
+            } catch (error) {
+                showOutput(outputId, '<span class="demo-error">Fout: ' + error.message + '</span>', true);
+            }
+        }
+
+        async function testCreateRecipe() {
+            const outputId = 'demo-output-post';
+            showOutput(outputId, '<span class="demo-loading">Bezig met aanmaken...</span>');
+            
+            try {
+                const recipeData = {
+                    title: 'Demo Pasta ' + Math.floor(Math.random() * 10000),
+                    description: 'Test recipe gemaakt via de API demo',
+                    ingredients: '400g spaghetti, 200g pancetta, 4 eieren, 100g parmezaan, zout en peper',
+                    instructions: '1. Kook spaghetti. 2. Bak pancetta. 3. Mix eieren met kaas. 4. Combineer alles.',
+                    prep_time: 10,
+                    cook_time: 20,
+                    servings: 4,
+                    difficulty: 'medium',
+                    category_id: 1
+                };
+                
+                const response = await fetch('/api/recipes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(recipeData)
+                });
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showOutput(outputId, '<span class="demo-success">Recipe succesvol aangemaakt!</span>\n' + formatJSON(data));
+                } else {
+                    showOutput(outputId, '<span class="demo-error">Validatiefout:</span>\n' + formatJSON(data), true);
+                }
+            } catch (error) {
+                showOutput(outputId, '<span class="demo-error">Fout: ' + error.message + '</span>', true);
+            }
+        }
+    </script>
 </body>
 </html>

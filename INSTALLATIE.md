@@ -2,36 +2,44 @@
 
 ## ⚡ Quick Start
 
-### 1. Database Setup
-
-Je hebt een MySQL server nodig. Voer het volgende bestand uit in je MySQL:
-
-**Bestand:** `database.sql`
-
-**Opties:**
-- Via command line: `mysql -u root -p < database.sql`
-- Via phpMyAdmin: Importeer het bestand
-- Via MySQL Workbench: Open en voer het script uit
-
-Dit script:
-- Maakt de `recipe_manager` database aan
-- Maakt de `recipes` en `categories` tabellen
-- Voegt voorbeeld data toe (3 recipes en 6 categories)
-
-### 2. Environment Configuratie
+### 1. Environment Configuratie
 
 Pas het `.env` bestand aan met jouw MySQL credentials:
 
+**Voor lokale MySQL:**
 ```env
 PORT=3000
-
-# Pas deze aan naar jouw MySQL server
 DB_HOST=localhost
-DB_USER=root                    # ← Jouw MySQL gebruikersnaam
-DB_PASSWORD=jouw_wachtwoord    # ← Jouw MySQL wachtwoord
-DB_NAME=recipe_manager
+DB_USERNAME=root
+DB_PASSWORD=jouw_wachtwoord
+DB_DATABASE=recipe_manager
 DB_PORT=3306
 ```
+
+**Voor cloud database (zoals Aiven):**
+```env
+PORT=3000
+DB_HOST=jouw-database.aivencloud.com
+DB_USERNAME=avnadmin
+DB_PASSWORD=jouw_wachtwoord
+DB_DATABASE=defaultdb
+DB_PORT=10547
+DB_SSL_CA=./config/private/ca.pem  # Pad naar SSL certificaat
+```
+
+### 2. Database Setup
+
+Voer het setup script uit om de database tabellen aan te maken:
+
+```bash
+node setup-database.js
+```
+
+Dit script:
+- Maakt de `recipes` en `categories` tabellen aan
+- Voegt voorbeeld data toe (3 recipes en 6 categories)
+- Werkt met lokale én cloud databases
+- Je kunt het meerdere keren uitvoeren zonder problemen
 
 ### 3. Start de Server
 

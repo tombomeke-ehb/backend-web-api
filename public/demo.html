@@ -1482,9 +1482,9 @@
                 // Difficulty chart
                 const difficulties = data.recipes.byDifficulty || {};
                 console.log('Difficulties:', difficulties);
-                const easy = difficulties.easy || 0;
-                const medium = difficulties.medium || 0;
-                const hard = difficulties.hard || 0;
+                const easy = parseInt(difficulties.easy || 0, 10);
+                const medium = parseInt(difficulties.medium || 0, 10);
+                const hard = parseInt(difficulties.hard || 0, 10);
                 const total = easy + medium + hard;
                 console.log('Total difficulties:', {easy, medium, hard, total});
                 

@@ -27,7 +27,7 @@
             color: white;
             padding: 50px 40px;
             border-radius: 12px;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
             text-align: center;
         }
@@ -63,6 +63,47 @@
             color: #555;
             margin: 15px 0 10px;
             font-weight: 600;
+        }
+
+        .demo-banner {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 24px 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: 0 8px 25px rgba(16,185,129,0.25);
+        }
+        .demo-banner-text h3 {
+            color: white;
+            margin: 0 0 4px;
+            font-size: 1.25em;
+        }
+        .demo-banner-text p {
+            margin: 0;
+            opacity: 0.92;
+            font-size: 0.95em;
+        }
+        .demo-banner-btn {
+            background: white;
+            color: #059669;
+            padding: 14px 32px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1em;
+        }
+        .demo-banner-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
         
         .intro {
@@ -298,6 +339,7 @@
             h2 { font-size: 1.4em; }
             header { padding: 30px 20px; }
             .demo-buttons { grid-template-columns: 1fr; }
+            .demo-banner { text-align: center; justify-content: center; }
         }
     </style>
 </head>
@@ -307,11 +349,20 @@
         <p>Een database-driven REST API gebouwd met Node.js, Express en MySQL</p>
     </header>
 
+    <div class="demo-banner">
+        <div class="demo-banner-text">
+            <h3>Bekijk de API in actie</h3>
+            <p>Open de volledige demo-applicatie om recepten te browsen, filteren en toevoegen.</p>
+        </div>
+        <a href="/demo" class="demo-banner-btn">
+            <span>🚀</span> Open Recepten App
+        </a>
+    </div>
+
     <div class="intro">
         <h2>Welkom bij de Recipe Manager API</h2>
         <p>Deze API stelt je in staat om recepten en categorieën te beheren. Alle responses zijn in JSON formaat.</p>
         <p><strong>Base URL:</strong> <code>http://localhost:3000/api</code></p>
-        <p><strong>Live demo:</strong> open <a href="/demo">/demo</a> om de API in actie te zien.</p>
     </div>
 
     <div class="feature-list">

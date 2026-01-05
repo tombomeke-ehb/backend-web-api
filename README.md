@@ -32,59 +32,47 @@ Dit project is een volledige API die voldoet aan alle functionele en technische 
 
 ## 🚀 Installatie & Setup
 
+> 📖 **Voor gedetailleerde installatie instructies, zie [INSTALLATIE.md](INSTALLATIE.md)**
+
 ### Vereisten
 - Node.js versie 20 of hoger
-- MySQL server (versie 5.7 of hoger)
+- MySQL server (lokaal of cloud zoals Aiven)
 - npm of yarn package manager
 
-### Stap 1: Database opzetten
+### Quick Start
 
-1. Start je MySQL server
-2. Importeer het database schema:
+**Stap 1: Environment configureren**
+
+Pas `.env` aan met jouw database credentials (ondersteunt lokale én cloud databases met SSL)
+
+**Stap 2: Database opzetten**
 
 ```bash
-mysql -u root -p < database.sql
+node setup-database.js
 ```
 
-Of voer het bestand handmatig uit in je MySQL client (phpMyAdmin, MySQL Workbench, etc.)
-
-### Stap 2: Project configureren
-
-1. Kopieer `.env.example` naar `.env`:
-```bash
-cp .env.example .env
-```
-
-2. Pas de database credentials aan in `.env`:
-```env
-PORT=3000
-
-DB_HOST=localhost
-DB_USER=jouw_mysql_gebruiker
-DB_PASSWORD=jouw_mysql_wachtwoord
-DB_NAME=recipe_manager
-DB_PORT=3306
-```
-
-### Stap 3: Dependencies installeren
+**Stap 3: Dependencies installeren**
 
 ```bash
 npm install
 ```
 
-### Stap 4: Server starten
+**Stap 4: Server starten**
 
-**Development mode (met auto-reload):**
 ```bash
 npm run dev
 ```
 
-**Production mode:**
-```bash
-npm start
-```
-
 De server draait nu op: `http://localhost:3000`
+
+Voor meer details en troubleshooting, zie [INSTALLATIE.md](INSTALLATIE.md).
+
+### Database Opties
+
+Het project ondersteunt:
+- **Lokale MySQL** - Standaard setup
+- **Cloud databases** - Aiven, AWS RDS, Google Cloud SQL
+- **SSL verbindingen** - Automatisch gedetecteerd via `DB_SSL_CA` environment variable
 
 ## 📚 API Documentatie
 

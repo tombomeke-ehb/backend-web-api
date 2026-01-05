@@ -920,12 +920,16 @@
                     <button class="btn btn-ghost btn-sm mt-4" onclick="loadStats()">
                         <span>🔄</span> Ververs
                     </button>
+                    <button class="btn btn-ghost btn-sm" onclick="alert('Button clicked! callCount=' + (window.callCount || 'undefined'))">
+                        <span>🧪</span> Test
+                    </button>
                 </div>
                 
                 <div class="card" style="text-align: center;">
                     <div style="font-size: 2em; margin-bottom: 8px;">📤</div>
                     <h3 style="margin-bottom: 8px;">Data Export</h3>
                     <div style="color: var(--text-muted); margin-bottom: 12px;">Download alle recepten</div>
+                    <div id="test-display" style="font-size: 0.8em; color: var(--text-muted); margin-bottom: 8px;">Test: -</div>
                     <div class="flex gap-2" style="justify-content: center;">
                         <a href="/api/export/json" class="btn btn-primary btn-sm" download>
                             <span>📋</span> JSON
@@ -983,6 +987,8 @@
 
     <script>
         console.log('=== Demo.html script starting ===');
+        // Log access to server
+        new Image().src = '/api/health';
         const API = '/api';
         const recipeGrid = document.getElementById('recipe-grid');
         const categoryGrid = document.getElementById('category-grid');
@@ -1622,13 +1628,30 @@
         }
 
         // Initial load
+        window.callCount = 0;
         console.log('Starting initial load...');
-        try { loadCategories(); } catch(e) { console.error('loadCategories error:', e); }
-        try { loadRecipes(); } catch(e) { console.error('loadRecipes error:', e); }
-        try { loadHealthCheck(); } catch(e) { console.error('loadHealthCheck error:', e); }
-        try { loadStats(); } catch(e) { console.error('loadStats error:', e); }
-        try { loadDeletedRecipes(); } catch(e) { console.error('loadDeletedRecipes error:', e); }
-        console.log('Initial load complete');
+        window.callCount++;
+        console.log('About to call loadCategories, count=' + window.callCount);
+        const testDisplay = document.getElementById('test-display');
+        if (testDisplay) testDisplay.textContent = 'Script initialized';
+        
+        // Direct API test
+        console.log('Making direct fetch call...');
+        fetch('/api/health').then(r => {
+            console.log('API response:', r.status);
+            window.apiWorked = true;
+        }).catch(e => {
+            console.error('API error:', e);
+            window.apiWorked = false;
+        });
+        
+        try { loadCategories(); window.callCount++; } catch(e) { console.error('loadCategories error:', e); window.callCount += 100; }
+        try { loadRecipes(); window.callCount++; } catch(e) { console.error('loadRecipes error:', e); window.callCount += 100; }
+        try { loadHealthCheck(); window.callCount++; } catch(e) { console.error('loadHealthCheck error:', e); window.callCount += 100; }
+        try { loadStats(); window.callCount++; } catch(e) { console.error('loadStats error:', e); window.callCount += 100; }
+        try { loadDeletedRecipes(); window.callCount++; } catch(e) { console.error('loadDeletedRecipes error:', e); window.callCount += 100; }
+        console.log('Initial load complete, count=' + window.callCount);
+        if (testDisplay) testDisplay.textContent = 'Calls: ' + window.callCount;
         
         // Start carousel after initial load
         setTimeout(startCarousel, 2000);

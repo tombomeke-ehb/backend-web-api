@@ -982,6 +982,7 @@
     <div id="toast" class="toast"></div>
 
     <script>
+        console.log('=== Demo.html script starting ===');
         const API = '/api';
         const recipeGrid = document.getElementById('recipe-grid');
         const categoryGrid = document.getElementById('category-grid');
@@ -1439,20 +1440,22 @@
 
         // Dashboard functions (defined before initial load)
         async function loadHealthCheck() {
+            console.log('loadHealthCheck called');
             try {
-                const statusEl = document.getElementById('health-status');
-                const uptimeEl = document.getElementById('health-uptime');
-                if (!statusEl || !uptimeEl) return; // Elements not ready yet
-                
                 const json = await fetchAPI(`${API}/health`);
-                statusEl.innerHTML = `<span style="color: var(--accent); font-weight: 700;">● Online</span>`;
-                
-                if (json.uptime) {
+                console.log('Health response:', json);
+                const statusEl = document.getElementById('health-status');
+                if (statusEl) {
+                    statusEl.innerHTML = `<span style="color: var(--accent); font-weight: 700;">● Online</span>`;
+                }
+                const uptimeEl = document.getElementById('health-uptime');
+                if (json.uptime && uptimeEl) {
                     const hours = Math.floor(json.uptime / 3600);
                     const mins = Math.floor((json.uptime % 3600) / 60);
                     uptimeEl.textContent = `Uptime: ${hours}u ${mins}m`;
                 }
             } catch (e) {
+                console.error('loadHealthCheck error:', e);
                 const statusEl = document.getElementById('health-status');
                 if (statusEl) {
                     statusEl.innerHTML = `<span style="color: var(--danger); font-weight: 700;">● Offline</span>`;
@@ -1462,40 +1465,43 @@
 
         async function loadStats() {
             try {
-                const overviewEl = document.getElementById('stats-overview');
-                const chartEl = document.getElementById('difficulty-chart');
-                if (!overviewEl || !chartEl) return; // Elements not ready yet
-                
                 const json = await fetchAPI(`${API}/stats`);
                 const data = json.data;
                 
-                overviewEl.innerHTML = `
-                    <div style="font-size: 1.8em; font-weight: 700; color: var(--primary);">${data.totalRecipes}</div>
-                    <div>recepten in ${data.totalCategories} categorieën</div>
-                `;
+                const overviewEl = document.getElementById('stats-overview');
+                if (overviewEl) {
+                    overviewEl.innerHTML = `
+                        <div style="font-size: 1.8em; font-weight: 700; color: var(--primary);">${data.totalRecipes}</div>
+                        <div>recepten in ${data.totalCategories} categorieën</div>
+                    `;
+                }
                 
                 // Difficulty chart
                 const difficulties = data.recipesByDifficulty || {};
                 const total = (difficulties.easy || 0) + (difficulties.medium || 0) + (difficulties.hard || 0);
                 
-                chartEl.innerHTML = `
-                    <div style="text-align: center; padding: 16px; background: #d1fae5; border-radius: var(--radius-sm);">
-                        <div style="font-size: 1.8em; font-weight: 700; color: #065f46;">${difficulties.easy || 0}</div>
-                        <div style="color: #065f46; font-size: 0.9em;">Makkelijk</div>
-                        <div style="font-size: 0.8em; color: #065f46; opacity: 0.7;">${total ? Math.round((difficulties.easy || 0) / total * 100) : 0}%</div>
-                    </div>
-                    <div style="text-align: center; padding: 16px; background: #fef3c7; border-radius: var(--radius-sm);">
-                        <div style="font-size: 1.8em; font-weight: 700; color: #92400e;">${difficulties.medium || 0}</div>
-                        <div style="color: #92400e; font-size: 0.9em;">Gemiddeld</div>
-                        <div style="font-size: 0.8em; color: #92400e; opacity: 0.7;">${total ? Math.round((difficulties.medium || 0) / total * 100) : 0}%</div>
-                    </div>
-                    <div style="text-align: center; padding: 16px; background: #fee2e2; border-radius: var(--radius-sm);">
-                        <div style="font-size: 1.8em; font-weight: 700; color: #991b1b;">${difficulties.hard || 0}</div>
-                        <div style="color: #991b1b; font-size: 0.9em;">Moeilijk</div>
-                        <div style="font-size: 0.8em; color: #991b1b; opacity: 0.7;">${total ? Math.round((difficulties.hard || 0) / total * 100) : 0}%</div>
-                    </div>
-                `;
+                const chartEl = document.getElementById('difficulty-chart');
+                if (chartEl) {
+                    chartEl.innerHTML = `
+                        <div style="text-align: center; padding: 16px; background: #d1fae5; border-radius: var(--radius-sm);">
+                            <div style="font-size: 1.8em; font-weight: 700; color: #065f46;">${difficulties.easy || 0}</div>
+                            <div style="color: #065f46; font-size: 0.9em;">Makkelijk</div>
+                            <div style="font-size: 0.8em; color: #065f46; opacity: 0.7;">${total ? Math.round((difficulties.easy || 0) / total * 100) : 0}%</div>
+                        </div>
+                        <div style="text-align: center; padding: 16px; background: #fef3c7; border-radius: var(--radius-sm);">
+                            <div style="font-size: 1.8em; font-weight: 700; color: #92400e;">${difficulties.medium || 0}</div>
+                            <div style="color: #92400e; font-size: 0.9em;">Gemiddeld</div>
+                            <div style="font-size: 0.8em; color: #92400e; opacity: 0.7;">${total ? Math.round((difficulties.medium || 0) / total * 100) : 0}%</div>
+                        </div>
+                        <div style="text-align: center; padding: 16px; background: #fee2e2; border-radius: var(--radius-sm);">
+                            <div style="font-size: 1.8em; font-weight: 700; color: #991b1b;">${difficulties.hard || 0}</div>
+                            <div style="color: #991b1b; font-size: 0.9em;">Moeilijk</div>
+                            <div style="font-size: 0.8em; color: #991b1b; opacity: 0.7;">${total ? Math.round((difficulties.hard || 0) / total * 100) : 0}%</div>
+                        </div>
+                    `;
+                }
             } catch (e) {
+                console.error('loadStats error:', e);
                 const overviewEl = document.getElementById('stats-overview');
                 const chartEl = document.getElementById('difficulty-chart');
                 if (overviewEl) overviewEl.innerHTML = `<span style="color: var(--danger);">Kon niet laden</span>`;
@@ -1505,11 +1511,11 @@
 
         async function loadDeletedRecipes() {
             try {
-                const container = document.getElementById('deleted-recipes');
-                if (!container) return; // Element not ready yet
-                
                 const json = await fetchAPI(`${API}/recipes/deleted`);
                 const recipes = json.data || [];
+                const container = document.getElementById('deleted-recipes');
+                
+                if (!container) return;
                 
                 if (recipes.length === 0) {
                     container.innerHTML = `
@@ -1554,6 +1560,7 @@
                     </table>
                 `;
             } catch (e) {
+                console.error('loadDeletedRecipes error:', e);
                 const container = document.getElementById('deleted-recipes');
                 if (container) {
                     container.innerHTML = `
@@ -1615,11 +1622,13 @@
         }
 
         // Initial load
-        loadCategories();
-        loadRecipes();
-        loadHealthCheck();
-        loadStats();
-        loadDeletedRecipes();
+        console.log('Starting initial load...');
+        try { loadCategories(); } catch(e) { console.error('loadCategories error:', e); }
+        try { loadRecipes(); } catch(e) { console.error('loadRecipes error:', e); }
+        try { loadHealthCheck(); } catch(e) { console.error('loadHealthCheck error:', e); }
+        try { loadStats(); } catch(e) { console.error('loadStats error:', e); }
+        try { loadDeletedRecipes(); } catch(e) { console.error('loadDeletedRecipes error:', e); }
+        console.log('Initial load complete');
         
         // Start carousel after initial load
         setTimeout(startCarousel, 2000);

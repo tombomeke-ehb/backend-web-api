@@ -87,7 +87,7 @@ Open je browser en ga naar:
   - Volledige HTML pagina op http://localhost:3000
   - Beschrijft alle endpoints met voorbeelden
 
-### ✨ Extra Features (Hoger Cijfer)
+### ✨ Extra Features
 
 - [x] **Geavanceerde validatie**
   - Unieke constraint: category namen moeten uniek zijn

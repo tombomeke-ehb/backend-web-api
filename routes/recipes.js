@@ -1,3 +1,9 @@
+/**
+ * Recipe Routes
+ * Definieert alle HTTP endpoints voor recipe CRUD operaties
+ * Elke route heeft validatie middleware voor input verificatie
+ */
+
 import express from 'express';
 import {
     getAllRecipes,

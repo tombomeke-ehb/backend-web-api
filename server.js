@@ -1,3 +1,19 @@
+/**
+ * Recipe Manager API Server
+ * 
+ * Een RESTful API voor het beheren van recepten en categorieën
+ * Gebouwd met Node.js, Express en MySQL
+ * 
+ * Features:
+ * - Volledige CRUD operaties voor recipes en categories
+ * - Geavanceerde filtering, pagination en sorting
+ * - Input validatie met express-validator
+ * - SSL database connectie support
+ * - HTML API documentatie
+ * 
+ * @author Backend Web API Project - EHB 2026
+ */
+
 import express from 'express';
 import dotenv from 'dotenv';
 import { testConnection } from './config/database.js';

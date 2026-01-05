@@ -1,7 +1,22 @@
+/**
+ * Database Setup Script
+ * 
+ * Dit script maakt de benodigde database tabellen aan en vult ze met seed data
+ * Kan veilig meerdere keren uitgevoerd worden (idempotent)
+ * 
+ * Gebruik: node setup-database.js
+ * 
+ * Database structuur:
+ * - categories: Bevat recipe categorieën (Ontbijt, Lunch, Diner, etc.)
+ * - recipes: Bevat recepten met foreign key naar categories
+ */
+
 import db from './config/database.js';
 
-// Database schema en seed data
-// Dit script maakt alle tabellen aan en vult ze met voorbeelddata
+/**
+ * Array van SQL statements die uitgevoerd moeten worden
+ * Volgorde is belangrijk: eerst categories (parent), dan recipes (child)
+ */
 const sqlStatements = [
     // Categories tabel
     `CREATE TABLE IF NOT EXISTS categories (
@@ -75,18 +90,18 @@ async function setupDatabase() {
             }
         }
         
-        console.log('\n✅ Database setup compleet!\n');
+        console.log('\nDatabase setup voltooid.\n');
         
-        // Toon resultaat
+        // Toon resultaat van de setup
         const [tables] = await db.query('SHOW TABLES');
-        console.log('📊 Tabellen in database:');
+        console.log('Tabellen in database:');
         for (const table of tables) {
             const tableName = Object.values(table)[0];
             const [rows] = await db.query(`SELECT COUNT(*) as count FROM ${tableName}`);
-            console.log(`   - ${tableName} (${rows[0].count} rijen)`);
+            console.log(`   - ${tableName}: ${rows[0].count} records`);
         }
         
-        console.log('\n🚀 Je kunt nu de server starten met: npm run dev\n');
+        console.log('\nServer kan gestart worden met: npm run dev\n');
         
         process.exit(0);
     } catch (error) {

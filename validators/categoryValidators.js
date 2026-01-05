@@ -1,6 +1,16 @@
 import { body, query, param } from 'express-validator';
 
-// Validatie voor het aanmaken van een category
+/**
+ * Validatie middleware voor categories
+ * Gebruikt express-validator voor input validatie
+ * Implementeert regex validatie voor alleen letters in namen
+ * 
+ * Bron: https://express-validator.github.io/docs/guides/getting-started
+ */
+
+/**
+ * Validatie regels voor het aanmaken van een nieuwe category
+ */
 export const createCategoryValidation = [
     body('name')
         .trim()
@@ -14,7 +24,9 @@ export const createCategoryValidation = [
         .isLength({ max: 500 }).withMessage('Beschrijving mag maximaal 500 karakters zijn')
 ];
 
-// Validatie voor het updaten van een category
+/**
+ * Validatie regels voor het updaten van een bestaande category
+ */
 export const updateCategoryValidation = [
     param('id')
         .isInt({ min: 1 }).withMessage('Category ID moet een positief getal zijn'),
@@ -31,19 +43,26 @@ export const updateCategoryValidation = [
         .isLength({ max: 500 }).withMessage('Beschrijving mag maximaal 500 karakters zijn')
 ];
 
-// Validatie voor het ophalen van een category
+/**
+ * Validatie regels voor het ophalen van een specifieke category
+ */
 export const getCategoryValidation = [
     param('id')
         .isInt({ min: 1 }).withMessage('Category ID moet een positief getal zijn')
 ];
 
-// Validatie voor het verwijderen van een category
+/**
+ * Validatie regels voor het verwijderen van een category
+ */
 export const deleteCategoryValidation = [
     param('id')
         .isInt({ min: 1 }).withMessage('Category ID moet een positief getal zijn')
 ];
 
-// Validatie voor lijst van categories
+/**
+ * Validatie regels voor het ophalen van een lijst van categories
+ * Bevat validatie voor pagination en search query parameters
+ */
 export const listCategoriesValidation = [
     query('limit')
         .optional()

@@ -1,7 +1,24 @@
 import db from '../config/database.js';
 
+/**
+ * Recipe Model
+ * Beheert alle database operaties voor recipes
+ * Implementeert CRUD operaties met filtering, pagination en sorting
+ */
 class Recipe {
-    // Haal alle recipes op met optionele filters, pagination en sorting
+    /**
+     * Haal alle recipes op met optionele filters, pagination en sorting
+     * Ondersteunt multi-field search als extra feature
+     * @param {Object} options - Query opties
+     * @param {number} options.limit - Aantal resultaten (default: 10)
+     * @param {number} options.offset - Start positie (default: 0)
+     * @param {string} options.search - Zoekterm voor meerdere velden
+     * @param {string} options.difficulty - Filter op moeilijkheidsgraad
+     * @param {number} options.category_id - Filter op category
+     * @param {string} options.sort - Sorteer veld (default: created_at)
+     * @param {string} options.order - Sorteer richting asc/desc (default: desc)
+     * @returns {Object} Object met recipes array en pagination metadata
+     */
     static async findAll(options = {}) {
         const {
             limit = 10,
@@ -81,7 +98,11 @@ class Recipe {
         };
     }
 
-    // Vind één recipe op ID
+    /**
+     * Vind een specifieke recipe op basis van ID
+     * @param {number} id - Recipe ID
+     * @returns {Object|undefined} Recipe object of undefined als niet gevonden
+     */
     static async findById(id) {
         const query = `
             SELECT r.*, c.name as category_name 
@@ -93,7 +114,11 @@ class Recipe {
         return rows[0];
     }
 
-    // Maak een nieuwe recipe
+    /**
+     * Maak een nieuwe recipe aan in de database
+     * @param {Object} recipeData - Recipe data object
+     * @returns {Object} Nieuw aangemaakte recipe met gegenereerde ID
+     */
     static async create(recipeData) {
         const query = `
             INSERT INTO recipes (title, description, ingredients, instructions, prep_time, cook_time, servings, difficulty, category_id)
@@ -115,7 +140,13 @@ class Recipe {
         return this.findById(result.insertId);
     }
 
-    // Update een bestaande recipe
+    /**
+     * Update een bestaande recipe
+     * Bouwt dynamisch een UPDATE query op basis van meegegeven velden
+     * @param {number} id - Recipe ID
+     * @param {Object} recipeData - Te updaten velden
+     * @returns {Object} Geüpdatete recipe
+     */
     static async update(id, recipeData) {
         const fields = [];
         const values = [];
@@ -139,7 +170,11 @@ class Recipe {
         return this.findById(id);
     }
 
-    // Verwijder een recipe
+    /**
+     * Verwijder een recipe uit de database
+     * @param {number} id - Recipe ID
+     * @returns {boolean} True als verwijderd, false als niet gevonden
+     */
     static async delete(id) {
         const query = `DELETE FROM recipes WHERE id = ?`;
         const [result] = await db.query(query, [id]);

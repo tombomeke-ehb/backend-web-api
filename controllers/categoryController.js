@@ -1,7 +1,11 @@
 import { validationResult } from 'express-validator';
 import Category from '../models/Category.js';
 
-// Helper functie om validatie errors te formatteren
+/**
+ * Formatteert validatie errors in een gestandaardiseerd formaat
+ * @param {Object} errors - Validatie errors van express-validator
+ * @returns {Array} Geformatteerde array van error objecten
+ */
 const formatValidationErrors = (errors) => {
     return errors.array().map(err => ({
         field: err.path,
@@ -9,7 +13,13 @@ const formatValidationErrors = (errors) => {
     }));
 };
 
-// GET /api/categories - Haal alle categories op
+/**
+ * Haal alle categories op met optionele filtering en pagination
+ * @route GET /api/categories
+ * @param {Object} req.query.limit - Aantal resultaten (default: 50)
+ * @param {Object} req.query.offset - Start positie (default: 0)
+ * @param {Object} req.query.search - Zoekterm voor naam en beschrijving
+ */
 export const getAllCategories = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -43,7 +53,11 @@ export const getAllCategories = async (req, res) => {
     }
 };
 
-// GET /api/categories/:id - Haal één category op
+/**
+ * Haal een specifieke category op aan de hand van ID
+ * @route GET /api/categories/:id
+ * @param {Object} req.params.id - Category ID
+ */
 export const getCategoryById = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -77,7 +91,11 @@ export const getCategoryById = async (req, res) => {
     }
 };
 
-// GET /api/categories/:id/recipes - Haal alle recipes van een category op
+/**
+ * Haal alle recipes op die behoren tot een specifieke category
+ * @route GET /api/categories/:id/recipes
+ * @param {Object} req.params.id - Category ID
+ */
 export const getCategoryRecipes = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -115,7 +133,12 @@ export const getCategoryRecipes = async (req, res) => {
     }
 };
 
-// POST /api/categories - Maak een nieuwe category
+/**
+ * Maak een nieuwe category aan in de database
+ * Controleert of de naam uniek is voor data integriteit
+ * @route POST /api/categories
+ * @param {Object} req.body - Category data (name, description)
+ */
 export const createCategory = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -152,7 +175,13 @@ export const createCategory = async (req, res) => {
     }
 };
 
-// PUT /api/categories/:id - Update een category
+/**
+ * Update een bestaande category
+ * Valideert unieke naam constraint
+ * @route PUT /api/categories/:id
+ * @param {Object} req.params.id - Category ID
+ * @param {Object} req.body - Te updaten velden
+ */
 export const updateCategory = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -199,7 +228,12 @@ export const updateCategory = async (req, res) => {
     }
 };
 
-// DELETE /api/categories/:id - Verwijder een category
+/**
+ * Verwijder een category uit de database
+ * Voorkomt verwijdering als er nog recipes aan gekoppeld zijn
+ * @route DELETE /api/categories/:id
+ * @param {Object} req.params.id - Category ID
+ */
 export const deleteCategory = async (req, res) => {
     try {
         const errors = validationResult(req);

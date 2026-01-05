@@ -1,7 +1,16 @@
 import { body, query, param } from 'express-validator';
 
-// Basisvalidatie regels voor recipes
-// Bron: https://express-validator.github.io/docs/guides/getting-started
+/**
+ * Validatie middleware voor recipes
+ * Gebruikt express-validator voor input validatie
+ * 
+ * Bron: https://express-validator.github.io/docs/guides/getting-started
+ */
+
+/**
+ * Validatie regels voor het aanmaken van een nieuwe recipe
+ * Bevat basis en geavanceerde validatie (regex patterns, custom validators)
+ */
 export const createRecipeValidation = [
     body('title')
         .trim()
@@ -44,7 +53,11 @@ export const createRecipeValidation = [
         .optional()
         .isInt({ min: 1 }).withMessage('Category ID moet een positief getal zijn'),
     
-    // Geavanceerde validatie: totale tijd moet realistisch zijn
+    /**
+     * Geavanceerde validatie: Controleer dat totale bereidingstijd realistisch is
+     * Dit is een extra feature voor betere data kwaliteit
+     * Gebruikt custom validator van express-validator
+     */
     body().custom((value) => {
         const prepTime = parseInt(value.prep_time);
         const cookTime = parseInt(value.cook_time);
@@ -58,6 +71,9 @@ export const createRecipeValidation = [
     })
 ];
 
+/**
+ * Validatie regels voor het updaten van een bestaande recipe
+ */
 export const updateRecipeValidation = [
     param('id')
         .isInt({ min: 1 }).withMessage('Recipe ID moet een positief getal zijn'),
@@ -114,7 +130,11 @@ export const getRecipeValidation = [
         .isInt({ min: 1 }).withMessage('Recipe ID moet een positief getal zijn')
 ];
 
-// Validatie voor pagination en search
+/**
+ * Validatie regels voor het ophalen van een lijst van recipes
+ * Bevat validatie voor pagination query parameters
+ * Ondersteunt filtering en sorting via query parameters
+ */
 export const listRecipesValidation = [
     query('limit')
         .optional()

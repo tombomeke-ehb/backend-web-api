@@ -1,7 +1,11 @@
 import { validationResult } from 'express-validator';
 import Recipe from '../models/Recipe.js';
 
-// Helper functie om validatie errors te formatteren
+/**
+ * Formatteert validatie errors in een gestandaardiseerd formaat
+ * @param {Object} errors - Validatie errors van express-validator
+ * @returns {Array} Geformatteerde array van error objecten
+ */
 const formatValidationErrors = (errors) => {
     return errors.array().map(err => ({
         field: err.path,
@@ -9,7 +13,17 @@ const formatValidationErrors = (errors) => {
     }));
 };
 
-// GET /api/recipes - Haal alle recipes op met filtering, pagination en sorting
+/**
+ * Haal alle recipes op met optionele filtering, pagination en sorting
+ * @route GET /api/recipes
+ * @param {Object} req.query.limit - Aantal resultaten (default: 10)
+ * @param {Object} req.query.offset - Start positie (default: 0)
+ * @param {Object} req.query.search - Zoekterm voor title, description, ingredients
+ * @param {Object} req.query.difficulty - Filter op moeilijkheidsgraad
+ * @param {Object} req.query.category_id - Filter op category ID
+ * @param {Object} req.query.sort - Sorteer veld (default: created_at)
+ * @param {Object} req.query.order - Sorteer richting asc/desc (default: desc)
+ */
 export const getAllRecipes = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -47,7 +61,11 @@ export const getAllRecipes = async (req, res) => {
     }
 };
 
-// GET /api/recipes/:id - Haal één recipe op
+/**
+ * Haal een specifieke recipe op aan de hand van ID
+ * @route GET /api/recipes/:id
+ * @param {Object} req.params.id - Recipe ID
+ */
 export const getRecipeById = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -81,7 +99,11 @@ export const getRecipeById = async (req, res) => {
     }
 };
 
-// POST /api/recipes - Maak een nieuwe recipe
+/**
+ * Maak een nieuwe recipe aan in de database
+ * @route POST /api/recipes
+ * @param {Object} req.body - Recipe data (title, ingredients, instructions, etc.)
+ */
 export const createRecipe = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -109,7 +131,12 @@ export const createRecipe = async (req, res) => {
     }
 };
 
-// PUT /api/recipes/:id - Update een recipe
+/**
+ * Update een bestaande recipe
+ * @route PUT /api/recipes/:id
+ * @param {Object} req.params.id - Recipe ID
+ * @param {Object} req.body - Te updaten velden
+ */
 export const updateRecipe = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -145,7 +172,11 @@ export const updateRecipe = async (req, res) => {
     }
 };
 
-// DELETE /api/recipes/:id - Verwijder een recipe
+/**
+ * Verwijder een recipe uit de database
+ * @route DELETE /api/recipes/:id
+ * @param {Object} req.params.id - Recipe ID
+ */
 export const deleteRecipe = async (req, res) => {
     try {
         const errors = validationResult(req);

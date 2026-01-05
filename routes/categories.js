@@ -1,3 +1,9 @@
+/**
+ * Category Routes
+ * Definieert alle HTTP endpoints voor category CRUD operaties
+ * Bevat extra endpoint voor het ophalen van recipes per category
+ */
+
 import express from 'express';
 import {
     getAllCategories,

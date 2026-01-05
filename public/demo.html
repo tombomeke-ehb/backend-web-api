@@ -1439,10 +1439,11 @@
 
         // Dashboard functions (defined before initial load)
         const loadHealthCheck = async () => {
-            const statusEl = document.getElementById('health-status');
-            const uptimeEl = document.getElementById('health-uptime');
-            
             try {
+                const statusEl = document.getElementById('health-status');
+                const uptimeEl = document.getElementById('health-uptime');
+                if (!statusEl || !uptimeEl) return; // Elements not ready yet
+                
                 const json = await fetchAPI(`${API}/health`);
                 statusEl.innerHTML = `<span style="color: var(--accent); font-weight: 700;">● Online</span>`;
                 
@@ -1452,16 +1453,19 @@
                     uptimeEl.textContent = `Uptime: ${hours}u ${mins}m`;
                 }
             } catch (e) {
-                statusEl.innerHTML = `<span style="color: var(--danger); font-weight: 700;">● Offline</span>`;
-                uptimeEl.textContent = '';
+                const statusEl = document.getElementById('health-status');
+                if (statusEl) {
+                    statusEl.innerHTML = `<span style="color: var(--danger); font-weight: 700;">● Offline</span>`;
+                }
             }
         };
 
         const loadStats = async () => {
-            const overviewEl = document.getElementById('stats-overview');
-            const chartEl = document.getElementById('difficulty-chart');
-            
             try {
+                const overviewEl = document.getElementById('stats-overview');
+                const chartEl = document.getElementById('difficulty-chart');
+                if (!overviewEl || !chartEl) return; // Elements not ready yet
+                
                 const json = await fetchAPI(`${API}/stats`);
                 const data = json.data;
                 
@@ -1492,15 +1496,18 @@
                     </div>
                 `;
             } catch (e) {
-                overviewEl.innerHTML = `<span style="color: var(--danger);">Kon niet laden</span>`;
-                chartEl.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Statistieken niet beschikbaar</div>`;
+                const overviewEl = document.getElementById('stats-overview');
+                const chartEl = document.getElementById('difficulty-chart');
+                if (overviewEl) overviewEl.innerHTML = `<span style="color: var(--danger);">Kon niet laden</span>`;
+                if (chartEl) chartEl.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Statistieken niet beschikbaar</div>`;
             }
         };
 
         const loadDeletedRecipes = async () => {
-            const container = document.getElementById('deleted-recipes');
-            
             try {
+                const container = document.getElementById('deleted-recipes');
+                if (!container) return; // Element not ready yet
+                
                 const json = await fetchAPI(`${API}/recipes/deleted`);
                 const recipes = json.data || [];
                 
@@ -1547,12 +1554,15 @@
                     </table>
                 `;
             } catch (e) {
-                container.innerHTML = `
-                    <div class="empty-state" style="padding: 24px;">
-                        <div class="empty-state-icon">❌</div>
-                        <div class="empty-state-text">${e.message}</div>
-                    </div>
-                `;
+                const container = document.getElementById('deleted-recipes');
+                if (container) {
+                    container.innerHTML = `
+                        <div class="empty-state" style="padding: 24px;">
+                            <div class="empty-state-icon">❌</div>
+                            <div class="empty-state-text">${e.message}</div>
+                        </div>
+                    `;
+                }
             }
         };
 

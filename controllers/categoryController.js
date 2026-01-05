@@ -229,7 +229,7 @@ export const updateCategory = async (req, res) => {
 };
 
 /**
- * Verwijder een category uit de database
+ * Verwijder een category (soft delete)
  * Voorkomt verwijdering als er nog recipes aan gekoppeld zijn
  * @route DELETE /api/categories/:id
  * @param {Object} req.params.id - Category ID
@@ -264,13 +264,61 @@ export const deleteCategory = async (req, res) => {
         
         res.json({
             success: true,
-            message: 'Category succesvol verwijderd'
+            message: 'Category succesvol verwijderd (soft delete)'
         });
     } catch (error) {
         console.error('Error in deleteCategory:', error);
         res.status(500).json({
             success: false,
             message: 'Fout bij verwijderen van category',
+            error: error.message
+        });
+    }
+};
+
+/**
+ * Herstel een verwijderde category
+ * @route POST /api/categories/:id/restore
+ * @param {Object} req.params.id - Category ID
+ */
+export const restoreCategory = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: formatValidationErrors(errors)
+            });
+        }
+
+        // Check of category bestaat (inclusief deleted)
+        const existingCategory = await Category.findById(req.params.id, true);
+        if (!existingCategory) {
+            return res.status(404).json({
+                success: false,
+                message: 'Category niet gevonden'
+            });
+        }
+
+        if (!existingCategory.deleted_at) {
+            return res.status(400).json({
+                success: false,
+                message: 'Category is niet verwijderd en kan niet hersteld worden'
+            });
+        }
+
+        const restoredCategory = await Category.restore(req.params.id);
+        
+        res.json({
+            success: true,
+            message: 'Category succesvol hersteld',
+            data: restoredCategory
+        });
+    } catch (error) {
+        console.error('Error in restoreCategory:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Fout bij herstellen van category',
             error: error.message
         });
     }

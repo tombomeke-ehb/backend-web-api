@@ -11,7 +11,8 @@ import {
     getCategoryRecipes,
     createCategory,
     updateCategory,
-    deleteCategory
+    deleteCategory,
+    restoreCategory
 } from '../controllers/categoryController.js';
 import {
     listCategoriesValidation,
@@ -35,10 +36,13 @@ router.get('/:id/recipes', getCategoryValidation, getCategoryRecipes);
 // POST /api/categories - Maak een nieuwe category
 router.post('/', createCategoryValidation, createCategory);
 
+// POST /api/categories/:id/restore - Herstel een verwijderde category
+router.post('/:id/restore', getCategoryValidation, restoreCategory);
+
 // PUT /api/categories/:id - Update een category
 router.put('/:id', updateCategoryValidation, updateCategory);
 
-// DELETE /api/categories/:id - Verwijder een category
+// DELETE /api/categories/:id - Verwijder een category (soft delete)
 router.delete('/:id', deleteCategoryValidation, deleteCategory);
 
 export default router;

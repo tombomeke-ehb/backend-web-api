@@ -4,11 +4,13 @@ import db from '../config/database.js';
  * Recipe Model
  * Beheert alle database operaties voor recipes
  * Implementeert CRUD operaties met filtering, pagination en sorting
+ * Ondersteunt soft delete (data markeren als verwijderd i.p.v. permanent verwijderen)
  */
 class Recipe {
     /**
      * Haal alle recipes op met optionele filters, pagination en sorting
      * Ondersteunt multi-field search als extra feature
+     * Filtert automatisch soft-deleted items uit tenzij expliciet gevraagd
      * @param {Object} options - Query opties
      * @param {number} options.limit - Aantal resultaten (default: 10)
      * @param {number} options.offset - Start positie (default: 0)
@@ -17,6 +19,7 @@ class Recipe {
      * @param {number} options.category_id - Filter op category
      * @param {string} options.sort - Sorteer veld (default: created_at)
      * @param {string} options.order - Sorteer richting asc/desc (default: desc)
+     * @param {boolean} options.includeDeleted - Toon ook verwijderde items (default: false)
      * @returns {Object} Object met recipes array en pagination metadata
      */
     static async findAll(options = {}) {
@@ -27,7 +30,8 @@ class Recipe {
             difficulty = null,
             category_id = null,
             sort = 'created_at',
-            order = 'desc'
+            order = 'desc',
+            includeDeleted = false
         } = options;
 
         let query = `
@@ -37,6 +41,11 @@ class Recipe {
             WHERE 1=1
         `;
         const params = [];
+
+        // Filter soft-deleted items (tenzij expliciet gevraagd)
+        if (!includeDeleted) {
+            query += ` AND r.deleted_at IS NULL`;
+        }
 
         // Search in meerdere velden (extra feature)
         if (search) {
@@ -70,6 +79,10 @@ class Recipe {
         let countQuery = `SELECT COUNT(*) as total FROM recipes r WHERE 1=1`;
         const countParams = [];
         
+        if (!includeDeleted) {
+            countQuery += ` AND r.deleted_at IS NULL`;
+        }
+        
         if (search) {
             countQuery += ` AND (r.title LIKE ? OR r.description LIKE ? OR r.ingredients LIKE ?)`;
             const searchTerm = `%${search}%`;
@@ -101,15 +114,21 @@ class Recipe {
     /**
      * Vind een specifieke recipe op basis van ID
      * @param {number} id - Recipe ID
+     * @param {boolean} includeDeleted - Toon ook verwijderde items
      * @returns {Object|undefined} Recipe object of undefined als niet gevonden
      */
-    static async findById(id) {
-        const query = `
+    static async findById(id, includeDeleted = false) {
+        let query = `
             SELECT r.*, c.name as category_name 
             FROM recipes r
             LEFT JOIN categories c ON r.category_id = c.id
             WHERE r.id = ?
         `;
+        
+        if (!includeDeleted) {
+            query += ` AND r.deleted_at IS NULL`;
+        }
+        
         const [rows] = await db.query(query, [id]);
         return rows[0];
     }
@@ -171,14 +190,58 @@ class Recipe {
     }
 
     /**
-     * Verwijder een recipe uit de database
+     * Verwijder een recipe (soft delete)
+     * Markeert de recipe als verwijderd zonder data permanent te verwijderen
      * @param {number} id - Recipe ID
      * @returns {boolean} True als verwijderd, false als niet gevonden
      */
     static async delete(id) {
+        const query = `UPDATE recipes SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL`;
+        const [result] = await db.query(query, [id]);
+        return result.affectedRows > 0;
+    }
+
+    /**
+     * Herstel een soft-deleted recipe
+     * @param {number} id - Recipe ID
+     * @returns {Object|null} Herstelde recipe of null als niet gevonden
+     */
+    static async restore(id) {
+        const query = `UPDATE recipes SET deleted_at = NULL WHERE id = ?`;
+        const [result] = await db.query(query, [id]);
+        
+        if (result.affectedRows > 0) {
+            return this.findById(id);
+        }
+        return null;
+    }
+
+    /**
+     * Permanent verwijderen van een recipe (hard delete)
+     * Gebruik met voorzichtigheid - data kan niet worden hersteld
+     * @param {number} id - Recipe ID
+     * @returns {boolean} True als verwijderd
+     */
+    static async hardDelete(id) {
         const query = `DELETE FROM recipes WHERE id = ?`;
         const [result] = await db.query(query, [id]);
         return result.affectedRows > 0;
+    }
+
+    /**
+     * Haal alle soft-deleted recipes op
+     * @returns {Array} Array van verwijderde recipes
+     */
+    static async findDeleted() {
+        const query = `
+            SELECT r.*, c.name as category_name 
+            FROM recipes r
+            LEFT JOIN categories c ON r.category_id = c.id
+            WHERE r.deleted_at IS NOT NULL
+            ORDER BY r.deleted_at DESC
+        `;
+        const [rows] = await db.query(query);
+        return rows;
     }
 }
 

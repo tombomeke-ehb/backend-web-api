@@ -173,7 +173,8 @@ export const updateRecipe = async (req, res) => {
 };
 
 /**
- * Verwijder een recipe uit de database
+ * Verwijder een recipe (soft delete)
+ * De data blijft behouden maar wordt als verwijderd gemarkeerd
  * @route DELETE /api/recipes/:id
  * @param {Object} req.params.id - Recipe ID
  */
@@ -199,13 +200,84 @@ export const deleteRecipe = async (req, res) => {
         
         res.json({
             success: true,
-            message: 'Recipe succesvol verwijderd'
+            message: 'Recipe succesvol verwijderd (soft delete)'
         });
     } catch (error) {
         console.error('Error in deleteRecipe:', error);
         res.status(500).json({
             success: false,
             message: 'Fout bij verwijderen van recipe',
+            error: error.message
+        });
+    }
+};
+
+/**
+ * Herstel een verwijderde recipe
+ * @route POST /api/recipes/:id/restore
+ * @param {Object} req.params.id - Recipe ID
+ */
+export const restoreRecipe = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: formatValidationErrors(errors)
+            });
+        }
+
+        // Check of recipe bestaat (inclusief deleted)
+        const existingRecipe = await Recipe.findById(req.params.id, true);
+        if (!existingRecipe) {
+            return res.status(404).json({
+                success: false,
+                message: 'Recipe niet gevonden'
+            });
+        }
+
+        if (!existingRecipe.deleted_at) {
+            return res.status(400).json({
+                success: false,
+                message: 'Recipe is niet verwijderd en kan niet hersteld worden'
+            });
+        }
+
+        const restoredRecipe = await Recipe.restore(req.params.id);
+        
+        res.json({
+            success: true,
+            message: 'Recipe succesvol hersteld',
+            data: restoredRecipe
+        });
+    } catch (error) {
+        console.error('Error in restoreRecipe:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Fout bij herstellen van recipe',
+            error: error.message
+        });
+    }
+};
+
+/**
+ * Haal alle verwijderde recipes op
+ * @route GET /api/recipes/deleted
+ */
+export const getDeletedRecipes = async (req, res) => {
+    try {
+        const recipes = await Recipe.findDeleted();
+        
+        res.json({
+            success: true,
+            data: recipes,
+            total: recipes.length
+        });
+    } catch (error) {
+        console.error('Error in getDeletedRecipes:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Fout bij ophalen van verwijderde recipes',
             error: error.message
         });
     }

@@ -37,6 +37,100 @@ De API draait op: `http://localhost:3000`
 
 Bezoek `http://localhost:3000` in je browser voor de volledige interactieve API documentatie.
 
+## Voorbeelden
+
+### Zoeken naar pasta recipes
+
+- ✅ **Twee CRUD Interfaces** 
+  - Recipes: `GET /api/recipes`, `GET /api/recipes/:id`, `POST`, `PUT`, `DELETE`
+  - Categories: `GET /api/categories`, `GET /api/categories/:id`, `POST`, `PUT`, `DELETE`
+
+- **Basisvalidatie**
+  - Verplichte velden controleren
+  - Type validatie (getal vs tekst)
+  - Lengte validatie (min/max karakters)
+  - Formaat validatie (letters, nummers, etc)
+
+- **Pagination Support**
+  - Limit en offset parameters op alle list endpoints
+  - Metadata in response (totaal aantal items)
+
+- **Search Functionaliteit**
+  - `GET /api/recipes?search=term` - zoekt in 3 velden
+  - `GET /api/categories?search=term` - zoekt in naam
+
+- **API Documentatie**
+  - Volledige HTML documentatie op `http://localhost:3000/`
+  - Beschrijft alle endpoints met voorbeelden
+
+### Extra Features
+
+- **Geavanceerde Validatie**
+  - Unieke constraints (category namen moeten uniek zijn)
+  - Relatie validatie (prevent delete with foreign keys)
+  - Custom validatie (totale tijd >= 1 minuut)
+  - Formaat checks (regex patterns)
+
+- **Multi-Field Search** - Zoekt simultaan in title, description en ingredients
+
+- **Sorting Support** - Sort op title, prep_time, cook_time, created_at, servings
+
+- **Filtering** - Filter op difficulty level en category_id
+
+- **Enhanced Responses** - Recipe count per category, volledige relatie info
+
+### Technische Requirements
+
+- **Node.js**: versie 20.0.0 of hoger
+- **Express**: Web framework
+- **MySQL**: Database support (lokaal en cloud)
+- **HTTP Verbs**: Correct gebruik van GET, POST, PUT, DELETE
+- **REST API**: Follows REST design principles
+
+## Installatie & Setup
+
+Voor gedetailleerde installatie instructies, zie [INSTALLATIE.md](INSTALLATIE.md)
+
+### Vereisten
+- Node.js versie 20 of hoger
+- MySQL server (lokaal of cloud zoals Aiven)
+- npm of yarn package manager
+
+### Quick Start
+
+**Stap 1: Environment configureren**
+
+Pas `.env` aan met jouw database credentials (ondersteunt lokale én cloud databases met SSL)
+
+**Stap 2: Database opzetten**
+
+```bash
+node setup-database.js
+```
+
+**Stap 3: Dependencies installeren**
+
+```bash
+npm install
+```
+
+**Stap 4: Server starten**
+
+```bash
+npm run dev
+```
+
+De server draait nu op: `http://localhost:3000`
+
+Voor meer details en troubleshooting, zie [INSTALLATIE.md](INSTALLATIE.md).
+
+### Database Opties
+
+Het project ondersteunt:
+- **Lokale MySQL** - Standaard setup
+- **Cloud databases** - Aiven, AWS RDS, Google Cloud SQL
+- **SSL verbindingen** - Automatisch gedetecteerd via `DB_SSL_CA` environment variable
+
 ## API Documentatie
 
 Bezoek `http://localhost:3000` in je browser voor de volledige interactieve API documentatie.

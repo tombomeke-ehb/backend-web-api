@@ -1438,7 +1438,7 @@
         });
 
         // Dashboard functions (defined before initial load)
-        const loadHealthCheck = async () => {
+        async function loadHealthCheck() {
             try {
                 const statusEl = document.getElementById('health-status');
                 const uptimeEl = document.getElementById('health-uptime');
@@ -1458,9 +1458,9 @@
                     statusEl.innerHTML = `<span style="color: var(--danger); font-weight: 700;">● Offline</span>`;
                 }
             }
-        };
+        }
 
-        const loadStats = async () => {
+        async function loadStats() {
             try {
                 const overviewEl = document.getElementById('stats-overview');
                 const chartEl = document.getElementById('difficulty-chart');
@@ -1501,9 +1501,9 @@
                 if (overviewEl) overviewEl.innerHTML = `<span style="color: var(--danger);">Kon niet laden</span>`;
                 if (chartEl) chartEl.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Statistieken niet beschikbaar</div>`;
             }
-        };
+        }
 
-        const loadDeletedRecipes = async () => {
+        async function loadDeletedRecipes() {
             try {
                 const container = document.getElementById('deleted-recipes');
                 if (!container) return; // Element not ready yet
@@ -1564,9 +1564,9 @@
                     `;
                 }
             }
-        };
+        }
 
-        const restoreRecipe = async (id) => {
+        async function restoreRecipe(id) {
             try {
                 await fetchAPI(`${API}/recipes/${id}/restore`, { method: 'POST' });
                 showToast('Recept succesvol hersteld!', 'success');
@@ -1577,9 +1577,9 @@
             } catch (e) {
                 showToast(e.message, 'error');
             }
-        };
+        }
 
-        const deleteRecipe = async (id, title) => {
+        async function deleteRecipe(id, title) {
             if (!confirm(`Weet je zeker dat je "${title}" wilt verwijderen?\n\nHet recept kan later worden hersteld via het Dashboard.`)) {
                 return;
             }
@@ -1594,9 +1594,9 @@
             } catch (e) {
                 showToast(e.message, 'error');
             }
-        };
+        }
 
-        const deleteRecipeFromModal = async (id, title) => {
+        async function deleteRecipeFromModal(id, title) {
             if (!confirm(`Weet je zeker dat je "${title}" wilt verwijderen?\n\nHet recept kan later worden hersteld via het Dashboard.`)) {
                 return;
             }
@@ -1612,7 +1612,7 @@
             } catch (e) {
                 showToast(e.message, 'error');
             }
-        };
+        }
 
         // Initial load
         loadCategories();

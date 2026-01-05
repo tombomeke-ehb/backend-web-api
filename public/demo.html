@@ -1477,13 +1477,13 @@
                 const overviewEl = document.getElementById('stats-overview');
                 if (overviewEl) {
                     overviewEl.innerHTML = `
-                        <div style="font-size: 1.8em; font-weight: 700; color: var(--primary);">${data.totalRecipes}</div>
-                        <div>recepten in ${data.totalCategories} categorieën</div>
+                        <div style="font-size: 1.8em; font-weight: 700; color: var(--primary);">${data.recipes.total}</div>
+                        <div>recepten in ${data.categories.total} categorieën</div>
                     `;
                 }
                 
                 // Difficulty chart
-                const difficulties = data.recipesByDifficulty || {};
+                const difficulties = data.recipes.byDifficulty || {};
                 const total = (difficulties.easy || 0) + (difficulties.medium || 0) + (difficulties.hard || 0);
                 
                 const chartEl = document.getElementById('difficulty-chart');

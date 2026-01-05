@@ -63,7 +63,7 @@ Bezoek `http://localhost:3000` in je browser voor de volledige interactieve API 
   - Volledige HTML documentatie op `http://localhost:3000/`
   - Beschrijft alle endpoints met voorbeelden
 
-### Extra Features (voor hoger cijfer)
+### Extra Features
 
 - **Geavanceerde Validatie**
   - Unieke constraints (category namen moeten uniek zijn)

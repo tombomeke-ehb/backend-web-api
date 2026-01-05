@@ -204,16 +204,6 @@ MVC Pattern + Validators:
 └─────────────┘
 ```
 
-## 💡 Tips voor Demonstratie
-
-1. **Start met de documentatie pagina** - Laat zien hoe professioneel het eruit ziet
-2. **Demonstreer CRUD** - Voeg een recipe toe, update, en verwijder
-3. **Toon validatie** - Probeer een recipe met lege titel, toon error response
-4. **Pagination demonstreren** - `?limit=2&offset=0` en dan `?limit=2&offset=2`
-5. **Search functionaliteit** - Zoek op "pasta" of "kip"
-6. **Geavanceerde features** - Probeer een category met recipes te verwijderen
-7. **Sorting** - Toon recipes gesorteerd op kooktijd
-
 ## 🐛 Troubleshooting
 
 ### Database connectie mislukt?
@@ -277,5 +267,3 @@ Alle externe code is voorzien van bronvermelding:
 Zie comments in de code voor specifieke bronnen.
 
 ---
-
-**Succes met je project! 🚀**

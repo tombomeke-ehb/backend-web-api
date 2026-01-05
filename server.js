@@ -8,6 +8,12 @@
  * - Volledige CRUD operaties voor recipes en categories
  * - Geavanceerde filtering, pagination en sorting
  * - Input validatie met express-validator
+ * - Rate limiting voor API bescherming
+ * - Security headers met Helmet
+ * - CORS configuratie
+ * - Request logging met timestamps
+ * - Health check endpoint
+ * - Statistieken endpoint
  * - SSL database connectie support
  * - HTML API documentatie
  * 
@@ -16,7 +22,11 @@
 
 import express from 'express';
 import dotenv from 'dotenv';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+import cors from 'cors';
 import { testConnection } from './config/database.js';
+import db from './config/database.js';
 import recipesRouter from './routes/recipes.js';
 import categoriesRouter from './routes/categories.js';
 import { fileURLToPath } from 'url';
@@ -29,13 +39,81 @@ const PORT = process.env.PORT || 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Track server start time voor uptime berekening
+const serverStartTime = new Date();
 
-// Logging middleware
+/**
+ * Rate Limiter Configuration
+ * Beperkt het aantal requests per IP om misbruik te voorkomen
+ * Bron: https://www.npmjs.com/package/express-rate-limit
+ */
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minuten window
+    max: 100, // Maximaal 100 requests per window per IP
+    standardHeaders: true, // Return rate limit info in headers
+    legacyHeaders: false,
+    message: {
+        success: false,
+        message: 'Te veel requests, probeer het later opnieuw',
+        retryAfter: '15 minuten'
+    }
+});
+
+/**
+ * Stricter rate limiter voor POST/PUT/DELETE operaties
+ * Voorkomt spam en database overbelasting
+ */
+const writeOperationLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 30, // Maximaal 30 write operaties per 15 min
+    message: {
+        success: false,
+        message: 'Te veel write operaties, probeer het later opnieuw'
+    }
+});
+
+// Security Middleware - Helmet voor HTTP security headers
+// Bron: https://helmetjs.github.io/
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+            fontSrc: ["'self'", "https://fonts.gstatic.com"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
+            imgSrc: ["'self'", "data:", "https:"],
+        },
+    },
+    crossOriginEmbedderPolicy: false
+}));
+
+// CORS Configuration - Staat cross-origin requests toe
+// Bron: https://www.npmjs.com/package/cors
+app.use(cors({
+    origin: process.env.CORS_ORIGIN || '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset']
+}));
+
+// Body parsing middleware
+app.use(express.json({ limit: '10kb' })); // Limiteer body size voor security
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+/**
+ * Request Logging Middleware
+ * Logt alle requests met timestamp, method, path en response tijd
+ */
 app.use((req, res, next) => {
-    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+    const start = Date.now();
+    
+    res.on('finish', () => {
+        const duration = Date.now() - start;
+        console.log(
+            `${new Date().toISOString()} | ${req.method.padEnd(6)} | ${req.path.padEnd(30)} | ${res.statusCode} | ${duration}ms`
+        );
+    });
+    
     next();
 });
 
@@ -50,6 +128,125 @@ app.get('/', (req, res) => {
 // Demo pagina
 app.get('/demo', (req, res) => {
     res.sendFile(join(__dirname, 'public', 'demo.html'));
+});
+
+/**
+ * Health Check Endpoint
+ * Controleert of de API en database beschikbaar zijn
+ * Nuttig voor monitoring en load balancers
+ * @route GET /api/health
+ */
+app.get('/api/health', async (req, res) => {
+    const uptime = Math.floor((Date.now() - serverStartTime.getTime()) / 1000);
+    
+    try {
+        // Test database connectie
+        await db.query('SELECT 1');
+        
+        res.json({
+            success: true,
+            status: 'healthy',
+            uptime: `${uptime} seconden`,
+            timestamp: new Date().toISOString(),
+            database: 'connected',
+            version: '1.0.0'
+        });
+    } catch (error) {
+        res.status(503).json({
+            success: false,
+            status: 'unhealthy',
+            uptime: `${uptime} seconden`,
+            timestamp: new Date().toISOString(),
+            database: 'disconnected',
+            error: 'Database niet bereikbaar'
+        });
+    }
+});
+
+/**
+ * Statistieken Endpoint
+ * Geeft overzicht van alle data in de database
+ * @route GET /api/stats
+ */
+app.get('/api/stats', async (req, res) => {
+    try {
+        // Haal statistieken op uit de database
+        const [[recipeStats]] = await db.query(`
+            SELECT 
+                COUNT(*) as total_recipes,
+                AVG(prep_time + cook_time) as avg_total_time,
+                SUM(CASE WHEN difficulty = 'easy' THEN 1 ELSE 0 END) as easy_count,
+                SUM(CASE WHEN difficulty = 'medium' THEN 1 ELSE 0 END) as medium_count,
+                SUM(CASE WHEN difficulty = 'hard' THEN 1 ELSE 0 END) as hard_count,
+                AVG(servings) as avg_servings
+            FROM recipes
+        `);
+        
+        const [[categoryStats]] = await db.query(`
+            SELECT COUNT(*) as total_categories FROM categories
+        `);
+        
+        const [topCategories] = await db.query(`
+            SELECT c.name, COUNT(r.id) as recipe_count
+            FROM categories c
+            LEFT JOIN recipes r ON c.id = r.category_id
+            GROUP BY c.id, c.name
+            ORDER BY recipe_count DESC
+            LIMIT 5
+        `);
+        
+        const [recentRecipes] = await db.query(`
+            SELECT title, created_at FROM recipes 
+            ORDER BY created_at DESC 
+            LIMIT 5
+        `);
+        
+        res.json({
+            success: true,
+            data: {
+                recipes: {
+                    total: recipeStats.total_recipes,
+                    averageTotalTime: Math.round(recipeStats.avg_total_time || 0),
+                    averageServings: Math.round(recipeStats.avg_servings || 0),
+                    byDifficulty: {
+                        easy: recipeStats.easy_count || 0,
+                        medium: recipeStats.medium_count || 0,
+                        hard: recipeStats.hard_count || 0
+                    }
+                },
+                categories: {
+                    total: categoryStats.total_categories,
+                    topCategories: topCategories
+                },
+                recentRecipes: recentRecipes
+            },
+            generatedAt: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Error in stats endpoint:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Fout bij ophalen van statistieken',
+            error: error.message
+        });
+    }
+});
+
+// Apply rate limiting to API routes
+app.use('/api', apiLimiter);
+
+// Apply stricter rate limiting to write operations
+app.use('/api/recipes', (req, res, next) => {
+    if (['POST', 'PUT', 'DELETE'].includes(req.method)) {
+        return writeOperationLimiter(req, res, next);
+    }
+    next();
+});
+app.use('/api/categories', (req, res, next) => {
+    if (['POST', 'PUT', 'DELETE'].includes(req.method)) {
+        return writeOperationLimiter(req, res, next);
+    }
+    next();
 });
 
 // API Routes

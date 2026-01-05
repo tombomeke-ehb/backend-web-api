@@ -1011,6 +1011,12 @@
         };
 
         const scrollToSection = (id) => {
+            // Update active nav link
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            const activeLink = document.querySelector(`a[href="#${id}"]`);
+            if (activeLink) activeLink.classList.add('active');
+            
+            // Scroll to section
             document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         };
 
@@ -1434,9 +1440,13 @@
         // Initial load
         loadCategories();
         loadRecipes();
-        loadHealthCheck();
-        loadStats();
-        loadDeletedRecipes();
+        
+        // Load dashboard components after a short delay to ensure DOM is ready
+        setTimeout(() => {
+            loadHealthCheck().catch(e => console.error('Health check failed:', e));
+            loadStats().catch(e => console.error('Stats failed:', e));
+            loadDeletedRecipes().catch(e => console.error('Deleted recipes failed:', e));
+        }, 500);
         
         // Start carousel after initial load
         setTimeout(startCarousel, 2000);

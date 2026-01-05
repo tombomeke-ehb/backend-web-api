@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Manager API - Documentatie</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        h2 {
+            color: #667eea;
+            margin: 30px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        h3 {
+            color: #764ba2;
+            margin: 20px 0 10px;
+        }
+        
+        .intro {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .endpoint {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 0.85em;
+        }
+        
+        .get { background: #61affe; color: white; }
+        .post { background: #49cc90; color: white; }
+        .put { background: #fca130; color: white; }
+        .delete { background: #f93e3e; color: white; }
+        
+        .url {
+            font-family: 'Courier New', monospace;
+            background: #f0f0f0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        
+        .description {
+            margin: 15px 0;
+            color: #555;
+        }
+        
+        .params, .response {
+            margin: 15px 0;
+        }
+        
+        .params h4, .response h4 {
+            color: #666;
+            font-size: 0.95em;
+            margin-bottom: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            background: #fafafa;
+        }
+        
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        th {
+            background: #f0f0f0;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+        
+        .required { background: #ffe0e0; color: #c00; }
+        .optional { background: #e0f0ff; color: #06c; }
+        
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: #777;
+        }
+        
+        .feature-list {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .feature-list ul {
+            list-style-position: inside;
+            margin-left: 20px;
+        }
+        
+        .feature-list li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🍳 Recipe Manager API</h1>
+        <p>Een database-driven REST API gebouwd met Node.js, Express en MySQL</p>
+    </header>
+
+    <div class="intro">
+        <h2>Welkom bij de Recipe Manager API</h2>
+        <p>Deze API stelt je in staat om recepten en categorieën te beheren. Alle responses zijn in JSON formaat.</p>
+        <p><strong>Base URL:</strong> <code>http://localhost:3000/api</code></p>
+    </div>
+
+    <div class="feature-list">
+        <h2>✨ Features</h2>
+        <ul>
+            <li>✅ Volledige CRUD operaties voor Recipes en Categories</li>
+            <li>✅ Uitgebreide validatie van input data</li>
+            <li>✅ Pagination met limit en offset parameters</li>
+            <li>✅ Zoeken in meerdere velden (titel, beschrijving, ingrediënten)</li>
+            <li>✅ Filtering op difficulty en category</li>
+            <li>✅ Sorteren op verschillende velden (tijd, naam, datum)</li>
+            <li>✅ Geavanceerde validatie (unieke namen, relatie checks)</li>
+            <li>✅ Recipe count per category</li>
+        </ul>
+    </div>
+
+    <h2>📚 Recipes Endpoints</h2>
+
+    <div class="endpoint">
+        <h3><span class="method get">GET</span> Alle recipes ophalen</h3>
+        <div class="url">/api/recipes</div>
+        <div class="description">
+            Haal een lijst van alle recipes op met optionele filtering, pagination en sorting.
+        </div>
+        
+        <div class="params">
+            <h4>Query Parameters:</h4>
+            <table>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Beschrijving</th>
+                    <th>Default</th>
+                </tr>
+                <tr>
+                    <td><code>limit</code> <span class="badge optional">optional</span></td>
+                    <td>integer</td>
+                    <td>Aantal resultaten (1-100)</td>
+                    <td>10</td>
+                </tr>
+                <tr>
+                    <td><code>offset</code> <span class="badge optional">optional</span></td>
+                    <td>integer</td>
+                    <td>Startpositie voor resultaten</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td><code>search</code> <span class="badge optional">optional</span></td>
+                    <td>string</td>
+                    <td>Zoek in titel, beschrijving en ingrediënten</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><code>difficulty</code> <span class="badge optional">optional</span></td>
+                    <td>enum</td>
+                    <td>Filter op moeilijkheidsgraad (easy, medium, hard)</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><code>category_id</code> <span class="badge optional">optional</span></td>
+                    <td>integer</td>
+                    <td>Filter op category ID</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <td><code>sort</code> <span class="badge optional">optional</span></td>
+                    <td>enum</td>
+                    <td>Sorteer op: title, prep_time, cook_time, created_at, servings</td>
+                    <td>created_at</td>
+                </tr>
+                <tr>
+                    <td><code>order</code> <span class="badge optional">optional</span></td>
+                    <td>enum</td>
+                    <td>Sorteer richting: asc, desc</td>
+                    <td>desc</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="response">
+            <h4>Voorbeeld Response:</h4>
+            <pre>{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "title": "Pannenkoeken",
+      "description": "Heerlijke Nederlandse pannenkoeken",
+      "ingredients": "250g bloem, 2 eieren, 500ml melk...",
+      "instructions": "1. Mix alle ingrediënten...",
+      "prep_time": 10,
+      "cook_time": 15,
+      "servings": 4,
+      "difficulty": "easy",
+      "category_id": 1,
+      "category_name": "Ontbijt",
+      "created_at": "2026-01-05T10:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "total": 25,
+    "limit": 10,
+    "offset": 0,
+    "returned": 10
+  }
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method get">GET</span> Eén recipe ophalen</h3>
+        <div class="url">/api/recipes/:id</div>
+        <div class="description">
+            Haal de details van een specifieke recipe op aan de hand van het ID.
+        </div>
+        
+        <div class="params">
+            <h4>URL Parameters:</h4>
+            <table>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Beschrijving</th>
+                </tr>
+                <tr>
+                    <td><code>id</code> <span class="badge required">required</span></td>
+                    <td>integer</td>
+                    <td>Het ID van de recipe</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method post">POST</span> Recipe aanmaken</h3>
+        <div class="url">/api/recipes</div>
+        <div class="description">
+            Maak een nieuwe recipe aan in de database.
+        </div>
+        
+        <div class="params">
+            <h4>Body Parameters (JSON):</h4>
+            <table>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Beschrijving</th>
+                </tr>
+                <tr>
+                    <td><code>title</code> <span class="badge required">required</span></td>
+                    <td>string</td>
+                    <td>Titel van de recipe (3-200 karakters)</td>
+                </tr>
+                <tr>
+                    <td><code>description</code> <span class="badge optional">optional</span></td>
+                    <td>string</td>
+                    <td>Beschrijving van de recipe (max 1000 karakters)</td>
+                </tr>
+                <tr>
+                    <td><code>ingredients</code> <span class="badge required">required</span></td>
+                    <td>string</td>
+                    <td>Lijst van ingrediënten (min 10 karakters)</td>
+                </tr>
+                <tr>
+                    <td><code>instructions</code> <span class="badge required">required</span></td>
+                    <td>string</td>
+                    <td>Bereidingsinstructies (min 20 karakters)</td>
+                </tr>
+                <tr>
+                    <td><code>prep_time</code> <span class="badge required">required</span></td>
+                    <td>integer</td>
+                    <td>Voorbereidingstijd in minuten (0-1440)</td>
+                </tr>
+                <tr>
+                    <td><code>cook_time</code> <span class="badge required">required</span></td>
+                    <td>integer</td>
+                    <td>Kooktijd in minuten (0-1440)</td>
+                </tr>
+                <tr>
+                    <td><code>servings</code> <span class="badge required">required</span></td>
+                    <td>integer</td>
+                    <td>Aantal porties (1-100)</td>
+                </tr>
+                <tr>
+                    <td><code>difficulty</code> <span class="badge optional">optional</span></td>
+                    <td>enum</td>
+                    <td>Moeilijkheidsgraad: easy, medium, hard (default: medium)</td>
+                </tr>
+                <tr>
+                    <td><code>category_id</code> <span class="badge optional">optional</span></td>
+                    <td>integer</td>
+                    <td>ID van de category</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="response">
+            <h4>Voorbeeld Request Body:</h4>
+            <pre>{
+  "title": "Spaghetti Carbonara",
+  "description": "Authentieke Italiaanse pasta",
+  "ingredients": "400g spaghetti, 200g pancetta, 4 eieren, 100g parmezaan",
+  "instructions": "1. Kook de pasta. 2. Bak de pancetta. 3. Mix eieren met kaas...",
+  "prep_time": 10,
+  "cook_time": 20,
+  "servings": 4,
+  "difficulty": "medium",
+  "category_id": 3
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method put">PUT</span> Recipe updaten</h3>
+        <div class="url">/api/recipes/:id</div>
+        <div class="description">
+            Update een bestaande recipe. Je hoeft alleen de velden mee te geven die je wilt wijzigen.
+        </div>
+        
+        <div class="params">
+            <h4>URL Parameters:</h4>
+            <table>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Beschrijving</th>
+                </tr>
+                <tr>
+                    <td><code>id</code> <span class="badge required">required</span></td>
+                    <td>integer</td>
+                    <td>Het ID van de recipe</td>
+                </tr>
+            </table>
+            
+            <h4>Body Parameters (JSON):</h4>
+            <p>Alle velden zijn optioneel. Geef alleen de velden mee die je wilt updaten.</p>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method delete">DELETE</span> Recipe verwijderen</h3>
+        <div class="url">/api/recipes/:id</div>
+        <div class="description">
+            Verwijder een recipe uit de database.
+        </div>
+        
+        <div class="params">
+            <h4>URL Parameters:</h4>
+            <table>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Beschrijving</th>
+                </tr>
+                <tr>
+                    <td><code>id</code> <span class="badge required">required</span></td>
+                    <td>integer</td>
+                    <td>Het ID van de recipe</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <h2>📂 Categories Endpoints</h2>
+
+    <div class="endpoint">
+        <h3><span class="method get">GET</span> Alle categories ophalen</h3>
+        <div class="url">/api/categories</div>
+        <div class="description">
+            Haal een lijst van alle categories op met het aantal recipes per category.
+        </div>
+        
+        <div class="params">
+            <h4>Query Parameters:</h4>
+            <table>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Beschrijving</th>
+                    <th>Default</th>
+                </tr>
+                <tr>
+                    <td><code>limit</code> <span class="badge optional">optional</span></td>
+                    <td>integer</td>
+                    <td>Aantal resultaten (1-100)</td>
+                    <td>50</td>
+                </tr>
+                <tr>
+                    <td><code>offset</code> <span class="badge optional">optional</span></td>
+                    <td>integer</td>
+                    <td>Startpositie voor resultaten</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td><code>search</code> <span class="badge optional">optional</span></td>
+                    <td>string</td>
+                    <td>Zoek in naam en beschrijving</td>
+                    <td>-</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="response">
+            <h4>Voorbeeld Response:</h4>
+            <pre>{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "Ontbijt",
+      "description": "Recepten voor een gezond ontbijt",
+      "recipe_count": 5,
+      "created_at": "2026-01-05T10:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "total": 6,
+    "limit": 50,
+    "offset": 0,
+    "returned": 6
+  }
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method get">GET</span> Eén category ophalen</h3>
+        <div class="url">/api/categories/:id</div>
+        <div class="description">
+            Haal de details van een specifieke category op.
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method get">GET</span> Recipes van een category</h3>
+        <div class="url">/api/categories/:id/recipes</div>
+        <div class="description">
+            Haal alle recipes op die behoren tot een specifieke category.
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method post">POST</span> Category aanmaken</h3>
+        <div class="url">/api/categories</div>
+        <div class="description">
+            Maak een nieuwe category aan. De naam moet uniek zijn.
+        </div>
+        
+        <div class="params">
+            <h4>Body Parameters (JSON):</h4>
+            <table>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Beschrijving</th>
+                </tr>
+                <tr>
+                    <td><code>name</code> <span class="badge required">required</span></td>
+                    <td>string</td>
+                    <td>Naam van de category (2-100 karakters, uniek)</td>
+                </tr>
+                <tr>
+                    <td><code>description</code> <span class="badge optional">optional</span></td>
+                    <td>string</td>
+                    <td>Beschrijving van de category (max 500 karakters)</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method put">PUT</span> Category updaten</h3>
+        <div class="url">/api/categories/:id</div>
+        <div class="description">
+            Update een bestaande category. De naam moet uniek blijven.
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method delete">DELETE</span> Category verwijderen</h3>
+        <div class="url">/api/categories/:id</div>
+        <div class="description">
+            Verwijder een category. Dit is alleen mogelijk als er geen recipes aan gekoppeld zijn.
+        </div>
+    </div>
+
+    <h2>🔍 Voorbeelden</h2>
+
+    <div class="feature-list">
+        <h3>Zoeken en filteren van recipes:</h3>
+        <ul>
+            <li><code>GET /api/recipes?search=pasta</code> - Zoek recipes met "pasta" in titel, beschrijving of ingrediënten</li>
+            <li><code>GET /api/recipes?difficulty=easy</code> - Alleen makkelijke recipes</li>
+            <li><code>GET /api/recipes?category_id=1</code> - Alleen ontbijt recipes</li>
+            <li><code>GET /api/recipes?limit=5&offset=10</code> - Pagination: 5 resultaten vanaf positie 10</li>
+            <li><code>GET /api/recipes?sort=prep_time&order=asc</code> - Sorteer op bereidingstijd (laag naar hoog)</li>
+            <li><code>GET /api/recipes?search=kip&difficulty=easy&sort=cook_time</code> - Combineer meerdere filters</li>
+        </ul>
+    </div>
+
+    <h2>⚠️ Error Responses</h2>
+
+    <div class="feature-list">
+        <p>Alle errors volgen dit formaat:</p>
+        <pre>{
+  "success": false,
+  "message": "Beschrijving van de fout",
+  "errors": [
+    {
+      "field": "title",
+      "message": "Titel is verplicht"
+    }
+  ]
+}</pre>
+        
+        <h3>HTTP Status Codes:</h3>
+        <ul>
+            <li><strong>200 OK</strong> - Succesvolle request</li>
+            <li><strong>201 Created</strong> - Resource succesvol aangemaakt</li>
+            <li><strong>400 Bad Request</strong> - Validatiefout in de input</li>
+            <li><strong>404 Not Found</strong> - Resource niet gevonden</li>
+            <li><strong>500 Internal Server Error</strong> - Serverfout</li>
+        </ul>
+    </div>
+
+    <h2>💡 Validatie Regels</h2>
+
+    <div class="feature-list">
+        <h3>Recipes:</h3>
+        <ul>
+            <li>Titel moet tussen 3 en 200 karakters zijn</li>
+            <li>Titel mag alleen letters, cijfers en basis leestekens bevatten</li>
+            <li>Ingrediënten en instructies zijn verplicht</li>
+            <li>Tijden moeten tussen 0 en 1440 minuten zijn (24 uur)</li>
+            <li>Totale bereidingstijd (prep + cook) moet minimaal 1 minuut zijn</li>
+            <li>Aantal porties moet tussen 1 en 100 zijn</li>
+            <li>Difficulty moet easy, medium of hard zijn</li>
+        </ul>
+        
+        <h3>Categories:</h3>
+        <ul>
+            <li>Naam moet uniek zijn</li>
+            <li>Naam moet tussen 2 en 100 karakters zijn</li>
+            <li>Naam mag alleen letters en spaties bevatten</li>
+            <li>Een category kan niet verwijderd worden als er nog recipes aan gekoppeld zijn</li>
+        </ul>
+    </div>
+
+    <footer>
+        <p>Recipe Manager API v1.0.0 | Gemaakt met Node.js, Express en MySQL</p>
+        <p>Voor vragen of problemen, neem contact op met de ontwikkelaar</p>
+    </footer>
+</body>
+</html>

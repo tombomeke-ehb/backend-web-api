@@ -37,13 +37,13 @@ De API draait op: `http://localhost:3000`
 
 Bezoek `http://localhost:3000` in je browser voor de volledige interactieve API documentatie.
 
-## Voorbeelden
+## Features Overzicht
 
-### Zoeken naar pasta recipes
+### Functionele Minimum Requirements
 
-- ✅ **Twee CRUD Interfaces** 
-  - Recipes: `GET /api/recipes`, `GET /api/recipes/:id`, `POST`, `PUT`, `DELETE`
-  - Categories: `GET /api/categories`, `GET /api/categories/:id`, `POST`, `PUT`, `DELETE`
+- **Twee CRUD Interfaces** 
+  - Recipes: `GET`, `POST`, `PUT`, `DELETE` op `/api/recipes`
+  - Categories: `GET`, `POST`, `PUT`, `DELETE` op `/api/categories`
 
 - **Basisvalidatie**
   - Verplichte velden controleren
@@ -56,20 +56,20 @@ Bezoek `http://localhost:3000` in je browser voor de volledige interactieve API 
   - Metadata in response (totaal aantal items)
 
 - **Search Functionaliteit**
-  - `GET /api/recipes?search=term` - zoekt in 3 velden
-  - `GET /api/categories?search=term` - zoekt in naam
+  - `GET /api/recipes?search=term` - zoekt in meerdere velden
+  - `GET /api/categories?search=term` - zoekt in naam en beschrijving
 
 - **API Documentatie**
-  - Volledige HTML documentatie op `http://localhost:3000/`
-  - Beschrijft alle endpoints met voorbeelden
+  - Volledige HTML documentatie op `/`
+  - Interactieve demo op `/demo`
 
-### Extra Features
+### Extra Features (voor hogere score)
 
 - **Geavanceerde Validatie**
   - Unieke constraints (category namen moeten uniek zijn)
-  - Relatie validatie (prevent delete with foreign keys)
-  - Custom validatie (totale tijd >= 1 minuut)
-  - Formaat checks (regex patterns)
+  - Relatie validatie (voorkom delete met gekoppelde records)
+  - Custom validatie (totale bereidingstijd >= 1 minuut)
+  - Regex patterns voor formaat checks
 
 - **Multi-Field Search** - Zoekt simultaan in title, description en ingredients
 
@@ -77,7 +77,28 @@ Bezoek `http://localhost:3000` in je browser voor de volledige interactieve API 
 
 - **Filtering** - Filter op difficulty level en category_id
 
+- **Rate Limiting** - Bescherming tegen misbruik (100 req/15min, 30 writes/15min)
+
+- **Security Headers** - Helmet.js voor HTTP security headers
+
+- **CORS Support** - Cross-origin requests configuratie
+
+- **Soft Delete** - Data markeren als verwijderd i.p.v. permanent verwijderen
+  - `DELETE /api/recipes/:id` - soft delete
+  - `POST /api/recipes/:id/restore` - herstel verwijderde items
+  - `GET /api/recipes/deleted` - bekijk verwijderde items
+
+- **Health Check** - `GET /api/health` voor monitoring
+
+- **Statistieken** - `GET /api/stats` voor database statistieken
+
+- **Data Export** 
+  - `GET /api/export/json` - exporteer als JSON
+  - `GET /api/export/csv` - exporteer als CSV
+
 - **Enhanced Responses** - Recipe count per category, volledige relatie info
+
+- **Request Logging** - Gedetailleerde logging met response times
 
 ### Technische Requirements
 

@@ -63,7 +63,7 @@ Bezoek `http://localhost:3000` in je browser voor de volledige interactieve API 
   - Volledige HTML documentatie op `/`
   - Interactieve demo op `/demo`
 
-### Extra Features (voor hogere score)
+### Extra Features
 
 - **Geavanceerde Validatie**
   - Unieke constraints (category namen moeten uniek zijn)

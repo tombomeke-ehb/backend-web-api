@@ -377,6 +377,14 @@
             <li>Geavanceerde validatie (unieke namen, relatie checks)</li>
             <li>Recipe count per category</li>
         </ul>
+        <h3 style="margin-top: 20px; color: #667eea;">🆕 Extra Features</h3>
+        <ul>
+            <li>🛡️ <strong>Rate Limiting</strong> - Bescherming tegen te veel requests</li>
+            <li>🔒 <strong>Security Headers</strong> - Helmet.js voor veiligheid</li>
+            <li>🗑️ <strong>Soft Delete</strong> - Recepten herstellen na verwijderen</li>
+            <li>📊 <strong>Health Check & Stats</strong> - Server status en statistieken</li>
+            <li>📤 <strong>Data Export</strong> - Download als JSON of CSV</li>
+        </ul>
     </div>
 
     <h2>Interactieve API Demo</h2>
@@ -408,6 +416,20 @@
                 <button class="demo-btn demo-post" onclick="testCreateRecipe()">Test POST - Recipe maken</button>
             </div>
             <div id="demo-output-post" class="demo-output" style="display:none;"></div>
+        </div>
+
+        <div style="margin-top: 30px;">
+            <h4>🆕 Extra Endpoints</h4>
+            <div class="demo-buttons">
+                <button class="demo-btn demo-get" onclick="testHealthCheck()">🏥 Health Check</button>
+                <button class="demo-btn demo-get" onclick="testStats()">📊 Statistieken</button>
+                <button class="demo-btn demo-get" onclick="testDeletedRecipes()">🗑️ Verwijderde Recepten</button>
+            </div>
+            <div class="demo-buttons">
+                <button class="demo-btn demo-get" onclick="testExportJSON()">📤 Export JSON</button>
+                <button class="demo-btn demo-get" onclick="testExportCSV()">📄 Export CSV</button>
+            </div>
+            <div id="demo-output-extra" class="demo-output" style="display:none;"></div>
         </div>
     </div>
 
@@ -635,10 +657,10 @@
     </div>
 
     <div class="endpoint">
-        <h3><span class="method delete">DELETE</span> Recipe verwijderen</h3>
+        <h3><span class="method delete">DELETE</span> Recipe verwijderen (Soft Delete)</h3>
         <div class="url">/api/recipes/:id</div>
         <div class="description">
-            Verwijder een recipe uit de database.
+            Verwijder een recipe uit de database. <strong>Let op:</strong> Dit is een soft delete - de data blijft bewaard en kan hersteld worden.
         </div>
         
         <div class="params">
@@ -655,6 +677,38 @@
                     <td>Het ID van de recipe</td>
                 </tr>
             </table>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method post">POST</span> Recipe herstellen</h3>
+        <div class="url">/api/recipes/:id/restore</div>
+        <div class="description">
+            Herstel een eerder (soft) verwijderde recipe.
+        </div>
+        
+        <div class="params">
+            <h4>URL Parameters:</h4>
+            <table>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Type</th>
+                    <th>Beschrijving</th>
+                </tr>
+                <tr>
+                    <td><code>id</code> <span class="badge required">required</span></td>
+                    <td>integer</td>
+                    <td>Het ID van de verwijderde recipe</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method get">GET</span> Verwijderde recipes ophalen</h3>
+        <div class="url">/api/recipes/deleted</div>
+        <div class="description">
+            Haal een lijst op van alle soft-deleted recipes die hersteld kunnen worden.
         </div>
     </div>
 
@@ -774,10 +828,83 @@
     </div>
 
     <div class="endpoint">
-        <h3><span class="method delete">DELETE</span> Category verwijderen</h3>
+        <h3><span class="method delete">DELETE</span> Category verwijderen (Soft Delete)</h3>
         <div class="url">/api/categories/:id</div>
         <div class="description">
-            Verwijder een category. Dit is alleen mogelijk als er geen recipes aan gekoppeld zijn.
+            Verwijder een category. Dit is alleen mogelijk als er geen recipes aan gekoppeld zijn. Soft delete: data blijft bewaard.
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method post">POST</span> Category herstellen</h3>
+        <div class="url">/api/categories/:id/restore</div>
+        <div class="description">
+            Herstel een eerder (soft) verwijderde category.
+        </div>
+    </div>
+
+    <h2>🆕 Extra Endpoints</h2>
+
+    <div class="endpoint">
+        <h3><span class="method get">GET</span> Health Check</h3>
+        <div class="url">/api/health</div>
+        <div class="description">
+            Controleer of de server en database correct functioneren. Handig voor monitoring.
+        </div>
+        
+        <div class="response">
+            <h4>Voorbeeld Response:</h4>
+            <pre>{
+  "status": "healthy",
+  "timestamp": "2026-01-05T15:30:00.000Z",
+  "uptime": 3600,
+  "database": "connected",
+  "version": "1.0.0"
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method get">GET</span> Statistieken</h3>
+        <div class="url">/api/stats</div>
+        <div class="description">
+            Haal statistieken op over de recepten database.
+        </div>
+        
+        <div class="response">
+            <h4>Voorbeeld Response:</h4>
+            <pre>{
+  "success": true,
+  "data": {
+    "totalRecipes": 37,
+    "totalCategories": 6,
+    "recipesByDifficulty": {
+      "easy": 15,
+      "medium": 12,
+      "hard": 10
+    },
+    "recipesByCategory": [
+      { "name": "Diner", "count": 8 },
+      { "name": "Ontbijt", "count": 7 }
+    ]
+  }
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method get">GET</span> Export als JSON</h3>
+        <div class="url">/api/export/json</div>
+        <div class="description">
+            Download alle recepten en categorieën als JSON bestand.
+        </div>
+    </div>
+
+    <div class="endpoint">
+        <h3><span class="method get">GET</span> Export als CSV</h3>
+        <div class="url">/api/export/csv</div>
+        <div class="description">
+            Download alle recepten als CSV bestand (Excel-compatibel).
         </div>
     </div>
 
@@ -932,6 +1059,70 @@
             } catch (error) {
                 showOutput(outputId, '<span class="demo-error">Fout: ' + error.message + '</span>', true);
             }
+        }
+
+        // Extra endpoint tests
+        async function testHealthCheck() {
+            const outputId = 'demo-output-extra';
+            showOutput(outputId, '<span class="demo-loading">Bezig met laden...</span>');
+            
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                showOutput(outputId, '<span class="demo-success">🏥 Health Check</span>\n' + formatJSON(data));
+            } catch (error) {
+                showOutput(outputId, '<span class="demo-error">Fout: ' + error.message + '</span>', true);
+            }
+        }
+
+        async function testStats() {
+            const outputId = 'demo-output-extra';
+            showOutput(outputId, '<span class="demo-loading">Bezig met laden...</span>');
+            
+            try {
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                showOutput(outputId, '<span class="demo-success">📊 Statistieken</span>\n' + formatJSON(data));
+            } catch (error) {
+                showOutput(outputId, '<span class="demo-error">Fout: ' + error.message + '</span>', true);
+            }
+        }
+
+        async function testDeletedRecipes() {
+            const outputId = 'demo-output-extra';
+            showOutput(outputId, '<span class="demo-loading">Bezig met laden...</span>');
+            
+            try {
+                const response = await fetch('/api/recipes/deleted');
+                const data = await response.json();
+                showOutput(outputId, '<span class="demo-success">🗑️ Verwijderde Recepten</span>\n' + formatJSON(data));
+            } catch (error) {
+                showOutput(outputId, '<span class="demo-error">Fout: ' + error.message + '</span>', true);
+            }
+        }
+
+        async function testExportJSON() {
+            const outputId = 'demo-output-extra';
+            showOutput(outputId, '<span class="demo-loading">Bezig met laden...</span>');
+            
+            try {
+                const response = await fetch('/api/export/json');
+                const data = await response.json();
+                showOutput(outputId, '<span class="demo-success">📤 Export JSON (preview)</span>\n' + formatJSON({
+                    success: true,
+                    message: 'Data export preview',
+                    totalRecipes: data.recipes?.length || 0,
+                    totalCategories: data.categories?.length || 0,
+                    tip: 'Klik op de link om te downloaden: /api/export/json'
+                }));
+            } catch (error) {
+                showOutput(outputId, '<span class="demo-error">Fout: ' + error.message + '</span>', true);
+            }
+        }
+
+        async function testExportCSV() {
+            const outputId = 'demo-output-extra';
+            showOutput(outputId, '<span class="demo-success">📄 Export CSV</span>\nKlik hier om het CSV bestand te downloaden:\n\n<a href="/api/export/csv" target="_blank" style="color: #49cc90; text-decoration: underline;">Download recipes.csv</a>');
         }
     </script>
 </body>

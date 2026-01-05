@@ -708,6 +708,7 @@
                 <a href="#recipes" class="nav-link active">Recepten</a>
                 <a href="#categories" class="nav-link">Categorieën</a>
                 <a href="#add" class="nav-link">Toevoegen</a>
+                <a href="#dashboard" class="nav-link">Dashboard</a>
                 <a href="/" class="nav-link">API Docs</a>
             </div>
         </div>
@@ -888,6 +889,80 @@
                         </button>
                     </div>
                 </form>
+            </div>
+        </section>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="mt-6">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-title-icon">📊</span>
+                    Dashboard & Tools
+                </div>
+            </div>
+            
+            <!-- Health & Stats Cards -->
+            <div class="grid grid-3" style="margin-bottom: 24px;">
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2em; margin-bottom: 8px;">🏥</div>
+                    <h3 style="margin-bottom: 8px;">Server Status</h3>
+                    <div id="health-status" style="color: var(--text-muted);">Laden...</div>
+                    <div id="health-uptime" style="font-size: 0.85em; color: var(--text-muted); margin-top: 4px;"></div>
+                    <button class="btn btn-ghost btn-sm mt-4" onclick="loadHealthCheck()">
+                        <span>🔄</span> Ververs
+                    </button>
+                </div>
+                
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2em; margin-bottom: 8px;">📈</div>
+                    <h3 style="margin-bottom: 8px;">Statistieken</h3>
+                    <div id="stats-overview" style="color: var(--text-muted);">Laden...</div>
+                    <button class="btn btn-ghost btn-sm mt-4" onclick="loadStats()">
+                        <span>🔄</span> Ververs
+                    </button>
+                </div>
+                
+                <div class="card" style="text-align: center;">
+                    <div style="font-size: 2em; margin-bottom: 8px;">📤</div>
+                    <h3 style="margin-bottom: 8px;">Data Export</h3>
+                    <div style="color: var(--text-muted); margin-bottom: 12px;">Download alle recepten</div>
+                    <div class="flex gap-2" style="justify-content: center;">
+                        <a href="/api/export/json" class="btn btn-primary btn-sm" download>
+                            <span>📋</span> JSON
+                        </a>
+                        <a href="/api/export/csv" class="btn btn-accent btn-sm" download>
+                            <span>📄</span> CSV
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Deleted Recipes Section -->
+            <div class="card">
+                <div class="flex justify-between items-center flex-wrap gap-3" style="margin-bottom: 20px;">
+                    <h3 style="display: flex; align-items: center; gap: 10px;">
+                        <span>🗑️</span> Verwijderde Recepten
+                    </h3>
+                    <button class="btn btn-ghost btn-sm" onclick="loadDeletedRecipes()">
+                        <span>🔄</span> Ververs
+                    </button>
+                </div>
+                <div id="deleted-recipes">
+                    <div class="empty-state" style="padding: 24px;">
+                        <div class="empty-state-icon">♻️</div>
+                        <div class="empty-state-text">Geen verwijderde recepten</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats by Difficulty -->
+            <div class="card mt-4">
+                <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                    <span>📊</span> Recepten per Moeilijkheid
+                </h3>
+                <div id="difficulty-chart" class="grid grid-3" style="gap: 12px;">
+                    <div class="loading"><div class="spinner"></div></div>
+                </div>
             </div>
         </section>
     </main>
@@ -1107,9 +1182,14 @@
                         </div>
                         <div class="recipe-card-footer">
                             ${r.category_name ? `<span class="badge badge-category">${r.category_name}</span>` : '<span></span>'}
-                            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); openRecipe(${r.id})">
-                                Bekijken →
-                            </button>
+                            <div class="flex gap-2">
+                                <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); deleteRecipe(${r.id}, '${r.title.replace(/'/g, "\\'")}')">
+                                    🗑️
+                                </button>
+                                <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); openRecipe(${r.id})">
+                                    Bekijken →
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `).join('');
@@ -1175,6 +1255,12 @@
                             <span>Voorbereiding: <strong>${r.prep_time} min</strong></span>
                             <span>Koken: <strong>${r.cook_time} min</strong></span>
                         </div>
+                    </div>
+                    
+                    <div class="flex gap-3 mt-4" style="padding-top: 20px; border-top: 1px solid var(--border);">
+                        <button class="btn btn-ghost" onclick="deleteRecipeFromModal(${r.id}, '${r.title.replace(/'/g, "\\'")}')">
+                            <span>🗑️</span> Verwijderen
+                        </button>
                     </div>
                 `;
 
@@ -1348,9 +1434,179 @@
         // Initial load
         loadCategories();
         loadRecipes();
+        loadHealthCheck();
+        loadStats();
+        loadDeletedRecipes();
         
         // Start carousel after initial load
         setTimeout(startCarousel, 2000);
+
+        // Dashboard functions
+        const loadHealthCheck = async () => {
+            const statusEl = document.getElementById('health-status');
+            const uptimeEl = document.getElementById('health-uptime');
+            
+            try {
+                const json = await fetchAPI(`${API}/health`);
+                statusEl.innerHTML = `<span style="color: var(--accent); font-weight: 700;">● Online</span>`;
+                
+                if (json.uptime) {
+                    const hours = Math.floor(json.uptime / 3600);
+                    const mins = Math.floor((json.uptime % 3600) / 60);
+                    uptimeEl.textContent = `Uptime: ${hours}u ${mins}m`;
+                }
+            } catch (e) {
+                statusEl.innerHTML = `<span style="color: var(--danger); font-weight: 700;">● Offline</span>`;
+                uptimeEl.textContent = '';
+            }
+        };
+
+        const loadStats = async () => {
+            const overviewEl = document.getElementById('stats-overview');
+            const chartEl = document.getElementById('difficulty-chart');
+            
+            try {
+                const json = await fetchAPI(`${API}/stats`);
+                const data = json.data;
+                
+                overviewEl.innerHTML = `
+                    <div style="font-size: 1.8em; font-weight: 700; color: var(--primary);">${data.totalRecipes}</div>
+                    <div>recepten in ${data.totalCategories} categorieën</div>
+                `;
+                
+                // Difficulty chart
+                const difficulties = data.recipesByDifficulty || {};
+                const total = (difficulties.easy || 0) + (difficulties.medium || 0) + (difficulties.hard || 0);
+                
+                chartEl.innerHTML = `
+                    <div style="text-align: center; padding: 16px; background: #d1fae5; border-radius: var(--radius-sm);">
+                        <div style="font-size: 1.8em; font-weight: 700; color: #065f46;">${difficulties.easy || 0}</div>
+                        <div style="color: #065f46; font-size: 0.9em;">Makkelijk</div>
+                        <div style="font-size: 0.8em; color: #065f46; opacity: 0.7;">${total ? Math.round((difficulties.easy || 0) / total * 100) : 0}%</div>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: #fef3c7; border-radius: var(--radius-sm);">
+                        <div style="font-size: 1.8em; font-weight: 700; color: #92400e;">${difficulties.medium || 0}</div>
+                        <div style="color: #92400e; font-size: 0.9em;">Gemiddeld</div>
+                        <div style="font-size: 0.8em; color: #92400e; opacity: 0.7;">${total ? Math.round((difficulties.medium || 0) / total * 100) : 0}%</div>
+                    </div>
+                    <div style="text-align: center; padding: 16px; background: #fee2e2; border-radius: var(--radius-sm);">
+                        <div style="font-size: 1.8em; font-weight: 700; color: #991b1b;">${difficulties.hard || 0}</div>
+                        <div style="color: #991b1b; font-size: 0.9em;">Moeilijk</div>
+                        <div style="font-size: 0.8em; color: #991b1b; opacity: 0.7;">${total ? Math.round((difficulties.hard || 0) / total * 100) : 0}%</div>
+                    </div>
+                `;
+            } catch (e) {
+                overviewEl.innerHTML = `<span style="color: var(--danger);">Kon niet laden</span>`;
+                chartEl.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Statistieken niet beschikbaar</div>`;
+            }
+        };
+
+        const loadDeletedRecipes = async () => {
+            const container = document.getElementById('deleted-recipes');
+            
+            try {
+                const json = await fetchAPI(`${API}/recipes/deleted`);
+                const recipes = json.data || [];
+                
+                if (recipes.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state" style="padding: 24px;">
+                            <div class="empty-state-icon">✨</div>
+                            <div class="empty-state-text">Geen verwijderde recepten - alles is bewaard!</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid var(--border);">
+                                <th style="text-align: left; padding: 12px; font-weight: 600;">Recept</th>
+                                <th style="text-align: left; padding: 12px; font-weight: 600;">Verwijderd op</th>
+                                <th style="text-align: right; padding: 12px; font-weight: 600;">Actie</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${recipes.map(r => `
+                                <tr style="border-bottom: 1px solid var(--border);">
+                                    <td style="padding: 12px;">
+                                        <span style="font-weight: 600;">${r.title}</span>
+                                        ${r.category_name ? `<span class="badge badge-category" style="margin-left: 8px;">${r.category_name}</span>` : ''}
+                                    </td>
+                                    <td style="padding: 12px; color: var(--text-muted);">
+                                        ${new Date(r.deleted_at).toLocaleDateString('nl-NL', { 
+                                            year: 'numeric', month: 'short', day: 'numeric', 
+                                            hour: '2-digit', minute: '2-digit' 
+                                        })}
+                                    </td>
+                                    <td style="padding: 12px; text-align: right;">
+                                        <button class="btn btn-accent btn-sm" onclick="restoreRecipe(${r.id})">
+                                            <span>♻️</span> Herstel
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (e) {
+                container.innerHTML = `
+                    <div class="empty-state" style="padding: 24px;">
+                        <div class="empty-state-icon">❌</div>
+                        <div class="empty-state-text">${e.message}</div>
+                    </div>
+                `;
+            }
+        };
+
+        const restoreRecipe = async (id) => {
+            try {
+                await fetchAPI(`${API}/recipes/${id}/restore`, { method: 'POST' });
+                showToast('Recept succesvol hersteld!', 'success');
+                loadDeletedRecipes();
+                loadRecipes();
+                loadCategories();
+                loadStats();
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        };
+
+        const deleteRecipe = async (id, title) => {
+            if (!confirm(`Weet je zeker dat je "${title}" wilt verwijderen?\n\nHet recept kan later worden hersteld via het Dashboard.`)) {
+                return;
+            }
+            
+            try {
+                await fetchAPI(`${API}/recipes/${id}`, { method: 'DELETE' });
+                showToast('Recept verwijderd (kan worden hersteld)', 'success');
+                loadRecipes();
+                loadCategories();
+                loadStats();
+                loadDeletedRecipes();
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        };
+
+        const deleteRecipeFromModal = async (id, title) => {
+            if (!confirm(`Weet je zeker dat je "${title}" wilt verwijderen?\n\nHet recept kan later worden hersteld via het Dashboard.`)) {
+                return;
+            }
+            
+            try {
+                await fetchAPI(`${API}/recipes/${id}`, { method: 'DELETE' });
+                closeModal();
+                showToast('Recept verwijderd (kan worden hersteld)', 'success');
+                loadRecipes();
+                loadCategories();
+                loadStats();
+                loadDeletedRecipes();
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        };
     </script>
 </body>
 </html>

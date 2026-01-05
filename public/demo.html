@@ -1607,13 +1607,9 @@
         // Initial load
         loadCategories();
         loadRecipes();
-        
-        // Load dashboard components after a short delay to ensure DOM is ready
-        setTimeout(() => {
-            loadHealthCheck().catch(e => console.error('Health check failed:', e));
-            loadStats().catch(e => console.error('Stats failed:', e));
-            loadDeletedRecipes().catch(e => console.error('Deleted recipes failed:', e));
-        }, 500);
+        loadHealthCheck();
+        loadStats();
+        loadDeletedRecipes();
         
         // Start carousel after initial load
         setTimeout(startCarousel, 2000);

@@ -1,22 +1,22 @@
 # Recipe Manager API - Installatie Instructies
 
-Een volledige gids voor het installeren en configureren van de Recipe Manager API.
+Stap-voor-stap gids voor het installeren en configureren van de Recipe Manager API.
+
+Voor meer informatie over requirements, database schema en architectuur, zie [REQUIREMENTS.md](REQUIREMENTS.md).
 
 ## Vereisten
 
-Zorg ervoor dat je het volgende hebt geïnstalleerd op je systeem:
+Zorg ervoor dat je het volgende hebt geïnstalleerd:
 
-- **Node.js**: versie 20.0.0 of hoger ([download](https://nodejs.org))
-  ```bash
-  node --version  # Controleer versie
-  ```
+- **Node.js**: versie 20.0.0 of hoger - [download](https://nodejs.org)
 - **npm**: wordt meegeleverd met Node.js
-  ```bash
-  npm --version
-  ```
-- **MySQL Database** (een van de volgende opties):
-  - Lokale MySQL server ([download](https://dev.mysql.com/downloads/mysql/))
-  - Cloud provider zoals Aiven, AWS RDS of Google Cloud SQL
+- **MySQL Database**: lokaal of cloud (Aiven, AWS RDS, Google Cloud SQL)
+
+Controleer versies:
+```bash
+node --version
+npm --version
+```
 
 ## Quick Start
 
@@ -33,13 +33,16 @@ cd backend-web-api
 npm install
 ```
 
-Dit installeert alle benodigde packages (Express, MySQL2, dotenv, express-validator, etc.)
-
 ### 3. Environment Configuratie
 
-Pas het `.env` bestand aan met jouw MySQL credentials:
+Kopieer `.env.example` naar `.env`:
+```bash
+cp .env.example .env
+```
 
-**Voor lokale MySQL:**
+Edit `.env` met jouw database credentials:
+
+**Lokale MySQL:**
 ```env
 PORT=3000
 DB_HOST=localhost
@@ -49,208 +52,90 @@ DB_DATABASE=recipe_manager
 DB_PORT=3306
 ```
 
-**Voor cloud database (zoals Aiven):**
+**Cloud Database (Aiven):**
 ```env
 PORT=3000
-DB_HOST=jouw-database.aivencloud.com
+DB_HOST=jouw-db.aivencloud.com
 DB_USERNAME=avnadmin
 DB_PASSWORD=jouw_wachtwoord
 DB_DATABASE=defaultdb
 DB_PORT=10547
-DB_SSL_CA=./config/private/ca.pem  # Pad naar SSL certificaat
+DB_SSL_CA=./config/private/ca.pem
 ```
 
-### 2. Database Setup
-
-Voer het setup script uit om de database tabellen aan te maken:
+### 4. Database Opzetten
 
 ```bash
 node setup-database.js
 ```
 
 Dit script:
-- Maakt de `recipes` en `categories` tabellen aan
-- Voegt voorbeeld data toe (3 recipes en 6 categories)
-- Werkt met lokale én cloud databases
-- Je kunt het meerdere keren uitvoeren zonder problemen
+- Maakt tabellen aan (recipes, categories)
+- Voegt voorbeeld data toe
+- Werkt met lokale en cloud databases
+- Kan meerdere keren uitgevoerd worden
 
-### 3. Start de Server
+### 5. Server Starten
 
-De dependencies zijn al geïnstalleerd! Start de server:
-
+Development mode (auto-reload):
 ```bash
 npm run dev
 ```
 
-Of voor productie:
-
+Production mode:
 ```bash
 npm start
 ```
 
-### 4. Test de API
-
-Open je browser en ga naar:
-- **API Documentatie:** http://localhost:3000
-- **Alle recipes:** http://localhost:3000/api/recipes
-- **Alle categories:** http://localhost:3000/api/categories
-
-## 📋 Checklist Project Requirements
-
-## Project Requirements
-
-### Functionele Minimum Requirements
-
-- **Twee CRUD interfaces**
-  - Recipes: GET lijst, GET detail, POST, PUT, DELETE
-  - Categories: GET lijst, GET detail, POST, PUT, DELETE
-
-- **Basisvalidatie**
-  - Velden mogen niet leeg zijn
-  - Numerieke velden accepteren geen strings
-  - Formaat validatie (geen cijfers in namen)
-
-- **Pagination endpoint**
-  - `GET /api/recipes?limit=10&offset=0`
-  - `GET /api/categories?limit=50&offset=0`
-
-- **Zoeken endpoint**
-  - `GET /api/recipes?search=pasta`
-  - Zoekt in title, description en ingredients
-
-- **Root documentatie**
-  - Volledige HTML pagina op http://localhost:3000
-  - Beschrijft alle endpoints met voorbeelden
-
-### Extra Features
-
-- **Geavanceerde validatie**
-  - Unieke constraint: category namen moeten uniek zijn
-  - Relatie validatie: category met recipes kan niet verwijderd
-  - Custom logic: totale tijd (prep + cook) moet minimaal 1 minuut
-
-- **Zoeken op meerdere velden**
-  - Search parameter zoekt in 3 velden: title, description, ingredients
-
-- **Resultaten sorteren**
-  - Sort op: title, prep_time, cook_time, created_at, servings
-  - Order: asc of desc
-
-- **Advanced filtering**
-  - Filter op difficulty en category_id
-  - Combineer meerdere filters
-
-- **Extra endpoints**
-  - `GET /api/categories/:id/recipes` - Alle recipes van een category
-
-### Technische Requirements
-
-- Node.js versie 20+
-- Express framework
-- MySQL database connectie
-- Juiste HTTP verbs (GET, POST, PUT, DELETE)
-
-## Test Voorbeelden
-
-### Recipes Testen
-
-```bash
-# Alle recipes ophalen (eerste 10)
-curl http://localhost:3000/api/recipes
-
-# Zoeken naar "pannenkoeken"
-curl http://localhost:3000/api/recipes?search=pannenkoeken
-
-# Makkelijke recipes, gesorteerd op bereidingstijd
-curl http://localhost:3000/api/recipes?difficulty=easy&sort=prep_time&order=asc
-
-# Recipe details ophalen (ID 1)
-curl http://localhost:3000/api/recipes/1
-
-# Nieuwe recipe aanmaken
-curl -X POST http://localhost:3000/api/recipes \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Omelet",
-    "ingredients": "3 eieren, 50ml melk, zout, peper",
-    "instructions": "1. Klop de eieren. 2. Voeg melk toe. 3. Bak in een pan.",
-    "prep_time": 5,
-    "cook_time": 10,
-    "servings": 2,
-    "difficulty": "easy",
-    "category_id": 1
-  }'
-
-# Recipe updaten
-curl -X PUT http://localhost:3000/api/recipes/1 \
-  -H "Content-Type: application/json" \
-  -d '{"servings": 6}'
-
-# Recipe verwijderen
-curl -X DELETE http://localhost:3000/api/recipes/1
-```
-
-### Categories Testen
-
-```bash
-# Alle categories ophalen
-curl http://localhost:3000/api/categories
-
-# Category details
-curl http://localhost:3000/api/categories/1
-
-# Recipes van een category
-curl http://localhost:3000/api/categories/1/recipes
-
-# Nieuwe category aanmaken
-curl -X POST http://localhost:3000/api/categories \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Snacks",
-    "description": "Kleine hapjes en snacks"
-  }'
-```
-
-## Project Architectuur
-
-```
-MVC Pattern + Validators:
-
-Routes → Validators → Controllers → Models → MySQL
-```
+De API is beschikbaar op: `http://localhost:3000`
 
 ## Troubleshooting
 
-### Database connectie mislukt?
-**Symptomen:** `Error: connect ECONNREFUSED 127.0.0.1:3306`
+### Database Connectie Mislukt
 
-**Oplossingen:**
-- Controleer of MySQL server draait:
-  - Windows: Check Services app (services.msc)
-  - Mac: Controleer in System Preferences > MySQL
+**Symptoom:** `Error: connect ECONNREFUSED 127.0.0.1:3306`
+
+**Oplossing:**
+- Controleer of MySQL server draait
+  - Windows: Services app (services.msc)
+  - Mac: System Preferences > MySQL
   - Linux: `sudo service mysql status`
-- Verifieer credentials in `.env` bestand
-- Test connectie handmatig: `mysql -h localhost -u root -p`
-- Controleer DB_PORT (default: 3306)
+- Verifieer `.env` credentials
+- Test connectie: `mysql -h localhost -u root -p`
+- Check DB_PORT (standaard: 3306)
 
-### Server start niet op poort 3000?
-**Symptomen:** `EADDRINUSE: address already in use :::3000`
+### Poort 3000 Al In Gebruik
 
-**Oplossingen:**
-- Wijzig PORT in `.env` naar bijvoorbeeld 3001
-- Of stop het programma dat poort 3000 gebruikt:
-  - Windows: `netstat -ano | findstr :3000` en kill het process ID
-  - Mac/Linux: `lsof -i :3000` en kill het process
+**Symptoom:** `EADDRINUSE: address already in use :::3000`
 
-### Setup script werkt niet?
+**Oplossing:**
+- Wijzig PORT in `.env` (bv. 3001)
+- Of stop het process dat poort 3000 gebruikt:
+  - Windows: `netstat -ano | findstr :3000`
+  - Mac/Linux: `lsof -i :3000`
+
+### Setup Script Werkt Niet
+
 - Zorg dat `.env` correct ingesteld is
 - Controleer databasenaam in `.env`
-- Run met verbose output: `node setup-database.js --debug`
-- Check MySQL user rechten (CREATE, INSERT)
+- Verifieer MySQL user rechten (CREATE, INSERT, DROP)
+- Zorg dat de database server draait
 
-## 📊 Database Schema
+## Database Schema
 
-**Recipes Table:**
+Voor complete database schema en veldtypes, zie [REQUIREMENTS.md](REQUIREMENTS.md#database-schema).
+
+## Code Kwaliteit
+
+- Error handling in controllers
+- Input validatie via express-validator
+- SQL injection preventie (prepared statements)
+- MVC pattern architectuur
+- Inline code documentation
+
+## Licentie
+
+ISC
 ```sql
 CREATE TABLE recipes (
   id INT AUTO_INCREMENT PRIMARY KEY,

@@ -2,22 +2,44 @@
 
 Een professionele, database-driven REST API gebouwd met Node.js, Express en MySQL voor het beheren van recepten en receptcategorieën.
 
-## Project Overzicht
+## Overzicht
 
-Dit project implementeert een volledige REST API die aan alle functionele en technische requirements voldoet. De API biedt complete CRUD-operaties voor twee entiteiten (Recipes en Categories), geavanceerde validatie, zoekfunctionaliteit, paginering en uitgebreide API-documentatie.
+Dit project implementeert een volledige REST API met CRUD-operaties voor twee entiteiten (Recipes en Categories). De API biedt geavanceerde validatie, zoekfunctionaliteit, paginering, filtering en uitgebreide API-documentatie.
 
 **Status:** Production Ready
 
-### Project Goals
-- Professionele API-architectuur met MVC pattern
-- Robuuste validatie en error handling
-- Uitgebreide documentatie en voorbeelden
-- Compliance met REST-API best practices
-- Support voor lokale en cloud databases
+De applicatie ondersteunt zowel lokale MySQL databases als cloud-gebaseerde databases (Aiven, AWS RDS, Google Cloud SQL) met automatische SSL-configuratie.
 
-## ✅ Functionele Requirements - Volledig Afgevinkt
+## Documentatie
 
-### Minimum Requirements (10-12 punten)
+- **[REQUIREMENTS.md](REQUIREMENTS.md)** - Functionele/technische requirements, database schema, validatie regels en architectuur
+- **[INSTALLATIE.md](INSTALLATIE.md)** - Stap-voor-stap installatie instructies
+
+## Quick Start
+
+```bash
+# 1. Dependencies installeren
+npm install
+
+# 2. Environment configureren (pas .env aan met jouw database credentials)
+cp .env.example .env
+
+# 3. Database opzetten
+node setup-database.js
+
+# 4. Server starten
+npm run dev
+```
+
+De API draait op: `http://localhost:3000`
+
+## API Documentatie
+
+Bezoek `http://localhost:3000` in je browser voor de volledige interactieve API documentatie.
+
+## Voorbeelden
+
+### Zoeken naar pasta recipes
 
 - ✅ **Twee CRUD Interfaces** 
   - Recipes: `GET /api/recipes`, `GET /api/recipes/:id`, `POST`, `PUT`, `DELETE`
@@ -191,215 +213,74 @@ Bezoek `http://localhost:3000` in je browser voor de volledige interactieve API 
 - `PUT /api/categories/:id` - Category updaten
 - `DELETE /api/categories/:id` - Category verwijderen
 
-### Voorbeelden
+## Voorbeelden
 
-**Zoeken naar pasta recipes:**
 ```bash
-curl http://localhost:3000/api/recipes?search=pasta
-```
+# Zoeken naar pasta recipes
+curl "http://localhost:3000/api/recipes?search=pasta"
 
-**Makkelijke recipes, gesorteerd op bereidingstijd:**
-```bash
-curl http://localhost:3000/api/recipes?difficulty=easy&sort=prep_time&order=asc
-```
+# Makkelijke recipes, gesorteerd op bereidingstijd
+curl "http://localhost:3000/api/recipes?difficulty=easy&sort=prep_time&order=asc"
 
-**Pagination (5 results, start bij 10):**
-```bash
-curl http://localhost:3000/api/recipes?limit=5&offset=10
-```
+# Pagination (5 results, start bij 0)
+curl "http://localhost:3000/api/recipes?limit=5&offset=0"
 
-**Nieuwe recipe aanmaken:**
-```bash
+# Nieuwe recipe aanmaken
 curl -X POST http://localhost:3000/api/recipes \
   -H "Content-Type: application/json" \
   -d '{
-    "title": "Spaghetti Carbonara",
-    "ingredients": "400g spaghetti, 200g pancetta, 4 eieren, 100g parmezaan",
-    "instructions": "1. Kook de pasta. 2. Bak de pancetta. 3. Mix eieren met kaas.",
+    "title": "Risotto",
+    "ingredients": "rice, broth",
+    "instructions": "Cook",
     "prep_time": 10,
     "cook_time": 20,
     "servings": 4,
     "difficulty": "medium",
-    "category_id": 3
+    "category_id": 1
   }'
 ```
 
-## Architectuur & Code Structuur
-
-### MVC + Validators Patroon
-
-```
-Routes (API Endpoints)
-    ↓
-Validators (Input Validation)
-    ↓
-Controllers (Business Logic)
-    ↓
-Models (Database Queries)
-    ↓
-MySQL Database
-```
-
-### Directory Structuur
-
-```
-backend-web-api/
-├── config/
-│   ├── database.js              # Database connection setup
-│   └── private/
-│       └── ca.pem               # SSL certificate (for cloud DB)
-│
-├── controllers/
-│   ├── recipeController.js      # Recipe business logic
-│   └── categoryController.js    # Category business logic
-│
-├── models/
-│   ├── Recipe.js                # Recipe database model
-│   └── Category.js              # Category database model
-│
-├── routes/
-│   ├── recipes.js               # Recipe endpoints
-│   └── categories.js            # Category endpoints
-│
-├── validators/
-│   ├── recipeValidators.js      # Recipe input validation rules
-│   └── categoryValidators.js    # Category input validation rules
-│
-├── public/
-│   └── index.html               # Interactive API documentation
-│
-├── server.js                    # Main server application
-├── setup-database.js            # Database initialization script
-├── package.json                 # Dependencies & scripts
-├── .env.example                 # Environment variables template
-└── INSTALLATIE.md               # Installation guide (Dutch)
-```
-
-### Code Conventions
-
-- **Controllers**: Behandelen HTTP requests, roepen models aan
-- **Models**: Direct database queries, geen business logic
-- **Validators**: express-validator middleware, input validation
-- **Routes**: Connecteren validators → controllers → database
-- **Error Handling**: Consistent error responses met status codes
-
 ## Gebruikte Technologieën
 
-- **Node.js**: JavaScript runtime
-- **Express**: Web framework
-- **MySQL2**: MySQL database driver met Promise support
-- **express-validator**: Input validatie middleware
-- **dotenv**: Environment variabelen beheer
-- **nodemon**: Development tool voor auto-reload
+| Technologie | Versie | Doel |
+|-------------|--------|------|
+| Node.js | 20.0.0+ | JavaScript runtime |
+| Express | 4.18.2 | Web framework |
+| MySQL2 | 3.6.5 | Database driver |
+| express-validator | 7.0.1 | Input validatie |
+| dotenv | 16.3.1 | Environment variables |
+| nodemon | 3.0.2 | Development tool |
 
-## Validatie & Error Handling
+## Testing
 
-#### Recipe Validatie
-| Veld | Regels | Type |
-|------|--------|------|
-| title | 3-200 chars, letters/numbers/punctuation | String |
-| description | Max 500 chars | String |
-| ingredients | Min 10 chars | String |
-| instructions | Min 20 chars | String |
-| prep_time | 0-1440 minuten | Integer |
-| cook_time | 0-1440 minuten | Integer |
-| servings | 1-100 | Integer |
-| difficulty | `easy`, `medium`, `hard` | Enum |
-| category_id | Bestaande category ID | Integer |
-
-**Custom Rules:**
-- Total time (prep + cook) moet >= 1 minuut
-- Category moet bestaan voordat recipe wordt aangemaakt
-
-#### Category Validatie
-| Veld | Regels | Type |
-|------|--------|------|
-| name | 2-100 chars, **unieke** naam, alleen letters | String |
-| description | Max 500 chars | String |
-
-**Custom Rules:**
-- Category kan niet verwijderd worden als recipes eraan gekoppeld zijn
-- Namen moeten uniek zijn in database
-
-### HTTP Status Codes
-
-| Code | Scenario |
-|------|----------|
-| 200 | Succesvol GET/PUT request |
-| 201 | Resource succesvol aangemaakt (POST) |
-| 204 | Resource succesvol verwijderd (DELETE) |
-| 400 | Validatiefout in input |
-| 404 | Resource niet gevonden |
-| 409 | Conflict (bv. unieke constraint violation) |
-| 422 | Unprocessable Entity (relatie validatie fout) |
-| 500 | Server error |
-
-## Testing de API
-
-### Testing Tools
-
-| Tool | Use Case |
-|------|----------|
-| Browser | Testen GET requests, documentatie bekijken |
-| Postman | Volledig API testen met alle HTTP methods |
-| cURL | Command-line testing (zie voorbeelden boven) |
-| Thunder Client | VS Code extensie voor integraal testen |
-| REST Client | VS Code extensie met `.rest` files |
-
-### Manueel Testen
-
-```bash
-# Health check
-curl http://localhost:3000
-
-# Get all recipes
-curl http://localhost:3000/api/recipes
-
-# Search
-curl "http://localhost:3000/api/recipes?search=pasta"
-
-# With pagination
-curl "http://localhost:3000/api/recipes?limit=5&offset=0"
-
-# Create new recipe
-curl -X POST http://localhost:3000/api/recipes \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Risotto","ingredients":"rice,broth","instructions":"Cook","prep_time":10,"cook_time":20,"servings":4,"difficulty":"medium","category_id":1}'
-
-# Update
-curl -X PUT http://localhost:3000/api/recipes/1 \
-  -H "Content-Type: application/json" \
-  -d '{"title":"Updated Recipe"}'
-
-# Delete
-curl -X DELETE http://localhost:3000/api/recipes/1
-```
+De API kan getest worden met:
+- **Browser** - Voor GET requests
+- **Postman** - Voor alle HTTP methods
+- **cURL** - Command-line testing
+- **Thunder Client** - VS Code extensie
 
 ## Bronvermelding
 
-Dit project is ontwikkeld met behulp van officiële documentatie en community best practices. Alle code is zelfgeschreven.
+Dit project is geheel origineel geschreven. Gebruikte bronnen:
 
-### Frameworks & Libraries
-- **Node.js Documentation** - https://nodejs.org/docs/latest/api/
-  - Server-side JavaScript runtime
-- **Express.js Documentation** - https://expressjs.com/
-  - Web framework en routing
-- **MySQL2 Package** - https://github.com/sidorares/node-mysql2
-  - Database connectie met Promise support
-- **express-validator** - https://express-validator.github.io/docs/
-  - Input validatie middleware
-- **dotenv** - https://github.com/motdotla/dotenv
-  - Environment variables management
+### Officiële Documentatie
+- [Node.js Documentation](https://nodejs.org/docs/latest/api/) - Server runtime
+- [Express.js Guide](https://expressjs.com/) - Web framework
+- [MySQL Documentation](https://dev.mysql.com/doc/refman/8.0/en/) - Database
+- [express-validator](https://express-validator.github.io/docs/) - Input validatie
 
 ### Database & Security
-- **MySQL 8.0 Documentation** - https://dev.mysql.com/doc/refman/8.0/en/
-  - SQL syntax en SSL configuratie
-- **MySQL SSL Connections** - https://dev.mysql.com/doc/refman/8.0/en/using-encrypted-connections.html
-  - Beveiligde cloud database connecties
+- [MySQL SSL Connections](https://dev.mysql.com/doc/refman/8.0/en/using-encrypted-connections.html) - Cloud database security
+- [Node.js Security](https://nodejs.org/en/docs/guides/security/) - Best practices
 
-### Development Standards
-- **Node.js Best Practices** - https://github.com/goldbergyoni/nodebestpractices
-- **REST API Design Guidelines** - https://restfulapi.net/
+### REST API Design
+- [REST API Design Guidelines](https://restfulapi.net/) - HTTP methods en patterns
+- [JSON API Specification](https://jsonapi.org/) - Response format design
+
+### AI Assistance
+- [GitHub Copilot](https://github.com/features/copilot) - Code generation, debugging en optimization
+  - Gebruikt voor code suggestions en problem-solving
+  - Alle gegenereerde code is gecontroleerd, aangepast en begrepen
 
 ## Auteur
 

@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recepten App | Ontdek heerlijke recepten</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --accent: #10b981;
+            --accent-dark: #059669;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg: #f8fafc;
+            --bg-alt: #f1f5f9;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            --radius: 16px;
+            --radius-sm: 10px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .animate-fadeInUp { animation: fadeInUp 0.5s ease-out forwards; }
+        .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-slideDown { animation: slideDown 0.3s ease-out forwards; }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 0 24px;
+        }
+        .navbar-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.3em;
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2em;
+        }
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .nav-link {
+            padding: 10px 18px;
+            border-radius: 999px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover {
+            background: var(--bg-alt);
+            color: var(--text);
+        }
+        .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            padding: 80px 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+        .hero-inner {
+            max-width: 1280px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+        .hero h1 {
+            color: white;
+            font-size: 3.2em;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        .hero p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.2em;
+            max-width: 600px;
+            margin: 0 auto 32px;
+            animation: fadeInUp 0.6s ease-out 0.1s backwards;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease-out 0.2s backwards;
+        }
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            margin-top: 48px;
+            animation: fadeInUp 0.6s ease-out 0.3s backwards;
+        }
+        .hero-stat {
+            text-align: center;
+            color: white;
+        }
+        .hero-stat-value {
+            font-size: 2.2em;
+            font-weight: 800;
+        }
+        .hero-stat-label {
+            font-size: 0.9em;
+            opacity: 0.85;
+        }
+
+        /* Main Content */
+        .main {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .section-title {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-title-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1em;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 999px;
+            font-weight: 600;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99,102,241,0.35);
+        }
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-accent:hover {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16,185,129,0.35);
+        }
+        .btn-outline {
+            background: white;
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+        .btn-ghost {
+            background: var(--bg-alt);
+            color: var(--text-muted);
+        }
+        .btn-ghost:hover {
+            background: var(--border);
+            color: var(--text);
+        }
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.88em;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 1em;
+            font-family: inherit;
+            background: white;
+            color: var(--text);
+            transition: all 0.2s ease;
+        }
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99,102,241,0.1);
+        }
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Grid */
+        .grid { display: grid; gap: 20px; }
+        .grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .grid-4 { grid-template-columns: repeat(4, 1fr); }
+        @media (max-width: 1024px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { 
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 2.2em; }
+            .hero-stats { gap: 24px; }
+        }
+
+        /* Recipe Cards */
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        .recipe-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            animation: fadeInUp 0.5s ease-out backwards;
+        }
+        .recipe-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-xl);
+        }
+        .recipe-card-image {
+            height: 160px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            position: relative;
+            overflow: hidden;
+        }
+        .recipe-card-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        .recipe-card-body {
+            padding: 20px;
+        }
+        .recipe-card-title {
+            font-size: 1.15em;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .recipe-card-desc {
+            color: var(--text-muted);
+            font-size: 0.92em;
+            margin-bottom: 16px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .recipe-card-meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .recipe-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.88em;
+            color: var(--text-muted);
+        }
+        .recipe-card-footer {
+            padding: 16px 20px;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 0.78em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-easy { background: #d1fae5; color: #065f46; }
+        .badge-medium { background: #fef3c7; color: #92400e; }
+        .badge-hard { background: #fee2e2; color: #991b1b; }
+        .badge-category { background: var(--bg-alt); color: var(--text-muted); }
+
+        /* Category Cards */
+        .category-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .category-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+        .category-card-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 1.5em;
+            color: white;
+        }
+        .category-card-name {
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 4px;
+        }
+        .category-card-count {
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+
+        /* Filters */
+        .filters-bar {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 28px;
+        }
+        .filters-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 180px;
+        }
+        .filter-group label {
+            display: block;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 0.95em;
+            background: white;
+            transition: all 0.2s ease;
+        }
+        .filter-group input:focus, .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15,23,42,0.6);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease-out;
+        }
+        .modal {
+            background: white;
+            border-radius: var(--radius);
+            max-width: 700px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: fadeInUp 0.3s ease-out;
+        }
+        .modal-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+        .modal-title {
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 999px;
+            border: none;
+            background: var(--bg-alt);
+            cursor: pointer;
+            font-size: 1.2em;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+        .modal-close:hover {
+            background: var(--danger);
+            color: white;
+        }
+        .modal-body {
+            padding: 28px;
+        }
+        .modal-section {
+            margin-bottom: 24px;
+        }
+        .modal-section-title {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--text);
+            color: white;
+            padding: 16px 24px;
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-xl);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast.success { background: var(--accent); }
+        .toast.error { background: var(--danger); }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 24px;
+            color: var(--text-muted);
+        }
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        .empty-state-text {
+            font-size: 1.1em;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 48px;
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Utility */
+        .mb-0 { margin-bottom: 0; }
+        .mt-4 { margin-top: 16px; }
+        .mt-6 { margin-top: 24px; }
+        .text-center { text-align: center; }
+        .flex { display: flex; }
+        .gap-2 { gap: 8px; }
+        .gap-3 { gap: 12px; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .flex-wrap { flex-wrap: wrap; }
+        
+        /* Carousel */
+        .section-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .carousel-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            margin-left: 10px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        .carousel-indicator.paused {
+            background: var(--text-muted);
+            animation: none;
+        }
+        .carousel-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 0 0 var(--radius) var(--radius);
+            transition: width 0.3s linear;
+        }
+        .recipe-grid {
+            position: relative;
+        }
+        .recipe-card {
+            transition: all 0.4s ease;
+        }
+        .recipe-card.shuffling {
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="/demo" class="logo">
+                <span class="logo-icon">🍳</span>
+                Recepten App
+            </a>
+            <div class="nav-links">
+                <a href="#recipes" class="nav-link active">Recepten</a>
+                <a href="#categories" class="nav-link">Categorieën</a>
+                <a href="#add" class="nav-link">Toevoegen</a>
+                <a href="/" class="nav-link">API Docs</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-inner">
+            <h1>Ontdek heerlijke recepten</h1>
+            <p>Blader door onze verzameling recepten, filter op moeilijkheid of categorie, en voeg je eigen favorieten toe.</p>
+            <div class="hero-actions">
+                <button class="btn btn-accent" onclick="loadRecipes()">
+                    <span>✨</span> Bekijk alle recepten
+                </button>
+                <button class="btn btn-outline" onclick="scrollToSection('add')">
+                    <span>➕</span> Recept toevoegen
+                </button>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-value" id="stat-recipes">-</div>
+                    <div class="hero-stat-label">Recepten</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value" id="stat-categories">-</div>
+                    <div class="hero-stat-label">Categorieën</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-value">∞</div>
+                    <div class="hero-stat-label">Mogelijkheden</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Filters -->
+        <section id="recipes">
+            <div class="filters-bar animate-fadeInUp">
+                <div class="filters-row">
+                    <div class="filter-group" style="flex: 2;">
+                        <label>Zoeken</label>
+                        <input type="text" id="search" placeholder="Zoek op naam, ingrediënt..." />
+                    </div>
+                    <div class="filter-group">
+                        <label>Moeilijkheid</label>
+                        <select id="difficulty">
+                            <option value="">Alle levels</option>
+                            <option value="easy">Makkelijk</option>
+                            <option value="medium">Gemiddeld</option>
+                            <option value="hard">Moeilijk</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Categorie</label>
+                        <select id="category">
+                            <option value="">Alle categorieën</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sorteren</label>
+                        <select id="sort">
+                            <option value="created_at">Nieuwste</option>
+                            <option value="title">Naam (A-Z)</option>
+                            <option value="prep_time">Snelste eerst</option>
+                            <option value="servings">Meeste porties</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="applyFilters()">
+                        <span>🔍</span> Zoeken
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recipe Grid -->
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-title-icon">📖</span>
+                    Recepten
+                    <span id="carousel-indicator" class="carousel-indicator" title="Recepten wisselen automatisch"></span>
+                </div>
+                <div class="section-actions">
+                    <button class="btn btn-ghost btn-sm" onclick="shuffleRecipes()" title="Andere recepten tonen">
+                        <span>🎲</span> Shuffle
+                    </button>
+                    <button id="carousel-toggle" class="btn btn-ghost btn-sm" onclick="toggleCarousel()" title="Auto-wissel aan/uit">
+                        <span>⏸️</span> Pauze
+                    </button>
+                    <button class="btn btn-ghost btn-sm" onclick="loadRecipes()">
+                        <span>🔄</span> Ververs
+                    </button>
+                </div>
+            </div>
+            <div id="recipe-grid" class="recipe-grid">
+                <div class="loading"><div class="spinner"></div></div>
+            </div>
+        </section>
+
+        <!-- Categories -->
+        <section id="categories" class="mt-6">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-title-icon">📂</span>
+                    Categorieën
+                </div>
+                <button class="btn btn-ghost btn-sm" onclick="loadCategories()">
+                    <span>🔄</span> Ververs
+                </button>
+            </div>
+            <div id="category-grid" class="grid grid-4">
+                <div class="loading"><div class="spinner"></div></div>
+            </div>
+        </section>
+
+        <!-- Add Recipe -->
+        <section id="add" class="mt-6">
+            <div class="section-header">
+                <div class="section-title">
+                    <span class="section-title-icon">✏️</span>
+                    Nieuw recept toevoegen
+                </div>
+            </div>
+            <div class="card">
+                <form id="create-form">
+                    <div class="grid grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Titel *</label>
+                            <input class="form-input" required name="title" placeholder="bv. Spaghetti Carbonara" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Moeilijkheid</label>
+                            <select class="form-select" name="difficulty">
+                                <option value="easy">Makkelijk</option>
+                                <option value="medium" selected>Gemiddeld</option>
+                                <option value="hard">Moeilijk</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Beschrijving</label>
+                            <textarea class="form-textarea" name="description" placeholder="Korte omschrijving van het gerecht..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Categorie</label>
+                            <select class="form-select" name="category_id" id="form-category">
+                                <option value="">Geen categorie</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Ingrediënten *</label>
+                            <textarea class="form-textarea" required name="ingredients" placeholder="500g pasta&#10;200g spek&#10;4 eieren..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Bereidingswijze *</label>
+                            <textarea class="form-textarea" required name="instructions" placeholder="1. Kook de pasta gaar&#10;2. Bak de spek krokant..."></textarea>
+                        </div>
+                        <div class="grid grid-3">
+                            <div class="form-group mb-0">
+                                <label class="form-label">Voorbereiding</label>
+                                <input class="form-input" type="number" name="prep_time" min="0" max="1440" value="15" placeholder="min" />
+                            </div>
+                            <div class="form-group mb-0">
+                                <label class="form-label">Kooktijd</label>
+                                <input class="form-input" type="number" name="cook_time" min="0" max="1440" value="20" placeholder="min" />
+                            </div>
+                            <div class="form-group mb-0">
+                                <label class="form-label">Porties</label>
+                                <input class="form-input" type="number" name="servings" min="1" max="100" value="4" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 justify-between mt-4" style="flex-wrap: wrap;">
+                        <button type="button" class="btn btn-ghost" onclick="fillDemoData()">
+                            <span>🎲</span> Vul voorbeeld in
+                        </button>
+                        <button type="submit" class="btn btn-accent">
+                            <span>💾</span> Recept opslaan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Recipe Detail Modal -->
+    <div id="modal-backdrop" class="modal-backdrop">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">Recept details</h2>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const API = '/api';
+        const recipeGrid = document.getElementById('recipe-grid');
+        const categoryGrid = document.getElementById('category-grid');
+        const categoryFilter = document.getElementById('category');
+        const formCategory = document.getElementById('form-category');
+        const createForm = document.getElementById('create-form');
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        const toast = document.getElementById('toast');
+        const carouselIndicator = document.getElementById('carousel-indicator');
+        const carouselToggle = document.getElementById('carousel-toggle');
+
+        // Carousel state
+        let carouselInterval = null;
+        let carouselPaused = false;
+        let currentOffset = 0;
+        let totalRecipes = 0;
+        const CAROUSEL_INTERVAL = 8000; // 8 seconds between shuffles
+
+        // Utility functions
+        const showToast = (message, type = '') => {
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        };
+
+        const scrollToSection = (id) => {
+            document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        const difficultyBadge = (level) => {
+            const labels = { easy: 'Makkelijk', medium: 'Gemiddeld', hard: 'Moeilijk' };
+            return `<span class="badge badge-${level}">${labels[level] || level}</span>`;
+        };
+
+        // Emoji mapping based on recipe title keywords
+        const getRecipeEmoji = (title, categoryName) => {
+            const t = title.toLowerCase();
+            const c = (categoryName || '').toLowerCase();
+            
+            // Specific recipe matches
+            if (t.includes('pannenkoek')) return '🥞';
+            if (t.includes('wafel')) return '🧇';
+            if (t.includes('ei') || t.includes('egg') || t.includes('scrambled') || t.includes('omelet')) return '🍳';
+            if (t.includes('toast') || t.includes('wentel')) return '🍞';
+            if (t.includes('avocado')) return '🥑';
+            if (t.includes('oats') || t.includes('haver') || t.includes('muesli')) return '🥣';
+            if (t.includes('pasta') || t.includes('spaghetti') || t.includes('carbonara') || t.includes('lasagne')) return '🍝';
+            if (t.includes('pizza')) return '🍕';
+            if (t.includes('salade') || t.includes('salad')) return '🥗';
+            if (t.includes('soep') || t.includes('soup')) return '🍲';
+            if (t.includes('curry')) return '🍛';
+            if (t.includes('sushi')) return '🍣';
+            if (t.includes('ramen') || t.includes('noedel') || t.includes('noodle') || t.includes('pad thai')) return '🍜';
+            if (t.includes('rijst') || t.includes('rice') || t.includes('risotto')) return '🍚';
+            if (t.includes('burger')) return '🍔';
+            if (t.includes('sandwich') || t.includes('club')) return '🥪';
+            if (t.includes('wrap') || t.includes('taco') || t.includes('falafel')) return '🌮';
+            if (t.includes('burrito')) return '🌯';
+            if (t.includes('steak') || t.includes('biefstuk') || t.includes('beef') || t.includes('bourguignon')) return '🥩';
+            if (t.includes('kip') || t.includes('chicken') || t.includes('teriyaki')) return '🍗';
+            if (t.includes('vis') || t.includes('fish') || t.includes('zalm') || t.includes('salmon')) return '🐟';
+            if (t.includes('garnaal') || t.includes('shrimp')) return '🦐';
+            if (t.includes('taart') || t.includes('cake') || t.includes('pie')) return '🍰';
+            if (t.includes('chocola') || t.includes('chocolate') || t.includes('lava')) return '🍫';
+            if (t.includes('tiramisu') || t.includes('panna cotta') || t.includes('crème')) return '🍮';
+            if (t.includes('ijs') || t.includes('ice')) return '🍨';
+            if (t.includes('cookie') || t.includes('koekje')) return '🍪';
+            if (t.includes('appel')) return '🍎';
+            if (t.includes('smoothie') || t.includes('shake')) return '🥤';
+            if (t.includes('koffie') || t.includes('coffee')) return '☕';
+            if (t.includes('brood') || t.includes('bread')) return '🥖';
+            if (t.includes('quiche') || t.includes('paprika') || t.includes('aubergine') || t.includes('shakshuka')) return '🥘';
+            if (t.includes('buddha') || t.includes('bowl')) return '🥙';
+            if (t.includes('linzen') || t.includes('lentil')) return '🫘';
+            
+            // Category-based fallback
+            if (c.includes('ontbijt') || c.includes('breakfast')) return '🍳';
+            if (c.includes('lunch')) return '🥪';
+            if (c.includes('diner') || c.includes('dinner')) return '🍽️';
+            if (c.includes('dessert')) return '🍰';
+            if (c.includes('vegetarisch') || c.includes('vegetarian')) return '🥬';
+            if (c.includes('vegan')) return '🌱';
+            
+            // Random fallback
+            const fallbacks = ['🍽️', '👨‍🍳', '🥄', '🍴'];
+            return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+        };
+
+        const categoryIcons = { 
+            'ontbijt': '🍳', 
+            'lunch': '🥗', 
+            'diner': '🍖', 
+            'dessert': '🍰', 
+            'vegetarisch': '🥬', 
+            'vegan': '🌱' 
+        };
+        const getCategoryIcon = (name) => {
+            const n = (name || '').toLowerCase();
+            return categoryIcons[n] || '🍽️';
+        };
+
+        // API calls
+        const fetchAPI = async (url, options = {}) => {
+            const res = await fetch(url, options);
+            const json = await res.json();
+            if (!res.ok) throw new Error(json.message || 'Er ging iets mis');
+            return json;
+        };
+
+        // Load categories
+        const loadCategories = async () => {
+            try {
+                const json = await fetchAPI(`${API}/categories`);
+                const cats = json.data || [];
+
+                // Update stats
+                document.getElementById('stat-categories').textContent = cats.length;
+
+                // Update filter dropdowns
+                const options = cats.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                categoryFilter.innerHTML = '<option value="">Alle categorieën</option>' + options;
+                formCategory.innerHTML = '<option value="">Geen categorie</option>' + options;
+
+                // Render category cards
+                if (cats.length === 0) {
+                    categoryGrid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">📂</div>
+                        <div class="empty-state-text">Nog geen categorieën</div>
+                    </div>`;
+                    return;
+                }
+
+                categoryGrid.innerHTML = cats.map((c, i) => `
+                    <div class="category-card" onclick="filterByCategory(${c.id})" style="animation-delay: ${i * 0.05}s">
+                        <div class="category-card-icon">${getCategoryIcon(c.name)}</div>
+                        <div class="category-card-name">${c.name}</div>
+                        <div class="category-card-count">${c.recipe_count || 0} recepten</div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                categoryGrid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="empty-state-text">Kon categorieën niet laden</div>
+                </div>`;
+            }
+        };
+
+        // Load recipes
+        const loadRecipes = async (filters = {}, shuffle = false) => {
+            // Add shuffle animation
+            if (shuffle) {
+                const cards = recipeGrid.querySelectorAll('.recipe-card');
+                cards.forEach(card => card.classList.add('shuffling'));
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+            
+            recipeGrid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+
+            try {
+                // For carousel: use random offset when shuffling
+                if (shuffle && totalRecipes > 12) {
+                    currentOffset = Math.floor(Math.random() * (totalRecipes - 11));
+                    filters.offset = currentOffset;
+                }
+                
+                const params = new URLSearchParams({ limit: 12, ...filters });
+                const json = await fetchAPI(`${API}/recipes?${params}`);
+                const recipes = json.data || [];
+
+                // Update stats and total count
+                totalRecipes = json.pagination?.total || recipes.length;
+                document.getElementById('stat-recipes').textContent = totalRecipes;
+
+                if (recipes.length === 0) {
+                    recipeGrid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-state-icon">🍽️</div>
+                        <div class="empty-state-text">Geen recepten gevonden</div>
+                        <button class="btn btn-primary mt-4" onclick="scrollToSection('add')">Voeg het eerste recept toe</button>
+                    </div>`;
+                    return;
+                }
+
+                recipeGrid.innerHTML = recipes.map((r, i) => `
+                    <div class="recipe-card" onclick="openRecipe(${r.id})" style="animation-delay: ${i * 0.05}s">
+                        <div class="recipe-card-image">${getRecipeEmoji(r.title, r.category_name)}</div>
+                        <div class="recipe-card-body">
+                            <div class="recipe-card-title">
+                                ${r.title}
+                                ${difficultyBadge(r.difficulty)}
+                            </div>
+                            <div class="recipe-card-desc">${r.description || 'Geen beschrijving beschikbaar'}</div>
+                            <div class="recipe-card-meta">
+                                <span class="recipe-meta-item">⏱️ ${r.prep_time + r.cook_time} min</span>
+                                <span class="recipe-meta-item">👥 ${r.servings} porties</span>
+                            </div>
+                        </div>
+                        <div class="recipe-card-footer">
+                            ${r.category_name ? `<span class="badge badge-category">${r.category_name}</span>` : '<span></span>'}
+                            <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation(); openRecipe(${r.id})">
+                                Bekijken →
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                recipeGrid.innerHTML = `<div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="empty-state-text">${e.message}</div>
+                </div>`;
+            }
+        };
+
+        // Filter functions
+        const applyFilters = () => {
+            const filters = {};
+            const search = document.getElementById('search').value.trim();
+            const difficulty = document.getElementById('difficulty').value;
+            const category = document.getElementById('category').value;
+            const sort = document.getElementById('sort').value;
+
+            if (search) filters.search = search;
+            if (difficulty) filters.difficulty = difficulty;
+            if (category) filters.category_id = category;
+            if (sort) filters.sort = sort;
+
+            loadRecipes(filters);
+        };
+
+        const filterByCategory = (catId) => {
+            document.getElementById('category').value = catId;
+            applyFilters();
+            scrollToSection('recipes');
+        };
+
+        // Open recipe modal
+        const openRecipe = async (id) => {
+            try {
+                const json = await fetchAPI(`${API}/recipes/${id}`);
+                const r = json.data;
+
+                modalTitle.textContent = r.title;
+                modalBody.innerHTML = `
+                    <div class="flex gap-2 flex-wrap items-center" style="margin-bottom: 20px;">
+                        ${difficultyBadge(r.difficulty)}
+                        ${r.category_name ? `<span class="badge badge-category">${r.category_name}</span>` : ''}
+                        <span class="badge badge-category">⏱️ ${r.prep_time + r.cook_time} min totaal</span>
+                        <span class="badge badge-category">👥 ${r.servings} porties</span>
+                    </div>
+                    
+                    ${r.description ? `<p style="color: var(--text-muted); margin-bottom: 24px;">${r.description}</p>` : ''}
+                    
+                    <div class="modal-section">
+                        <h4 class="modal-section-title">🥕 Ingrediënten</h4>
+                        <div style="white-space: pre-line; line-height: 1.8;">${r.ingredients}</div>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h4 class="modal-section-title">👨‍🍳 Bereidingswijze</h4>
+                        <div style="white-space: pre-line; line-height: 1.8;">${r.instructions}</div>
+                    </div>
+                    
+                    <div class="modal-section mb-0">
+                        <h4 class="modal-section-title">⏰ Tijden</h4>
+                        <div class="flex gap-3 flex-wrap">
+                            <span>Voorbereiding: <strong>${r.prep_time} min</strong></span>
+                            <span>Koken: <strong>${r.cook_time} min</strong></span>
+                        </div>
+                    </div>
+                `;
+
+                modalBackdrop.style.display = 'flex';
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        };
+
+        const closeModal = () => {
+            modalBackdrop.style.display = 'none';
+        };
+
+        modalBackdrop.addEventListener('click', (e) => {
+            if (e.target === modalBackdrop) closeModal();
+        });
+
+        // Create recipe
+        createForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(createForm);
+            const payload = Object.fromEntries(formData.entries());
+            payload.prep_time = Number(payload.prep_time);
+            payload.cook_time = Number(payload.cook_time);
+            payload.servings = Number(payload.servings);
+            if (!payload.category_id) delete payload.category_id;
+
+            try {
+                await fetchAPI(`${API}/recipes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                showToast('Recept succesvol toegevoegd!', 'success');
+                createForm.reset();
+                loadRecipes();
+                loadCategories();
+                scrollToSection('recipes');
+            } catch (e) {
+                showToast(e.message, 'error');
+            }
+        });
+
+        // Fill demo data with random category
+        const fillDemoData = () => {
+            const demos = [
+                {
+                    title: 'Pasta Carbonara',
+                    description: 'Romige Italiaanse klassieker met spek en ei',
+                    ingredients: '400g spaghetti\n200g spekblokjes\n4 eidooiers\n100g Parmezaanse kaas\nZout en peper',
+                    instructions: '1. Kook de pasta al dente\n2. Bak de spekblokjes krokant\n3. Mix eidooiers met geraspte kaas\n4. Meng alles en serveer direct',
+                    prep_time: 10,
+                    cook_time: 15,
+                    servings: 4,
+                    difficulty: 'medium',
+                    category_id: 3 // Diner
+                },
+                {
+                    title: 'Griekse Salade',
+                    description: 'Frisse salade met feta en olijven',
+                    ingredients: '2 komkommers\n4 tomaten\n1 rode ui\n200g feta\n100g zwarte olijven\nOlijfolie en oregano',
+                    instructions: '1. Snijd alle groenten in stukken\n2. Verkruimel de feta\n3. Meng alles in een grote kom\n4. Besprenkel met olijfolie en oregano',
+                    prep_time: 15,
+                    cook_time: 0,
+                    servings: 4,
+                    difficulty: 'easy',
+                    category_id: 2 // Lunch
+                },
+                {
+                    title: 'Beef Bourguignon',
+                    description: 'Klassieke Franse stoofschotel',
+                    ingredients: '1kg rundvlees\n750ml rode wijn\n200g spek\n300g champignons\nWortels en uien\nBouquet garni',
+                    instructions: '1. Snijd vlees in blokken en braad aan\n2. Bak spek en groenten\n3. Voeg wijn en kruiden toe\n4. Stoof 2-3 uur op laag vuur',
+                    prep_time: 30,
+                    cook_time: 180,
+                    servings: 6,
+                    difficulty: 'hard',
+                    category_id: 3 // Diner
+                },
+                {
+                    title: 'Chocolate Lava Cake',
+                    description: 'Smeltend hart van chocolade',
+                    ingredients: '200g pure chocolade\n100g boter\n4 eieren\n100g suiker\n50g bloem',
+                    instructions: '1. Smelt chocolade met boter\n2. Klop eieren met suiker\n3. Meng alles met bloem\n4. Bak 12 minuten op 200°C',
+                    prep_time: 15,
+                    cook_time: 12,
+                    servings: 4,
+                    difficulty: 'medium',
+                    category_id: 4 // Dessert
+                },
+                {
+                    title: 'Shakshuka',
+                    description: 'Midden-Oosterse gepocheerde eieren in tomatensaus',
+                    ingredients: '400g tomaten\n4 eieren\n1 paprika\n1 ui\nKnoflook en komijn\nFeta',
+                    instructions: '1. Bak ui, paprika en knoflook\n2. Voeg tomaten en kruiden toe\n3. Maak kuiltjes voor de eieren\n4. Pocheer tot gewenste garing',
+                    prep_time: 10,
+                    cook_time: 20,
+                    servings: 2,
+                    difficulty: 'easy',
+                    category_id: 5 // Vegetarisch
+                },
+                {
+                    title: 'Buddha Bowl',
+                    description: 'Gezonde bowl met granen en groenten',
+                    ingredients: 'Quinoa\nKikkererwten\nAvocado\nRode kool\nWortel\nTahini dressing',
+                    instructions: '1. Kook de quinoa\n2. Rooster kikkererwten met kruiden\n3. Snijd alle groenten\n4. Rangschik in een kom met dressing',
+                    prep_time: 20,
+                    cook_time: 25,
+                    servings: 2,
+                    difficulty: 'easy',
+                    category_id: 6 // Vegan
+                },
+                {
+                    title: 'French Toast',
+                    description: 'Wentelteefjes met kaneel en suiker',
+                    ingredients: '4 sneden brioche\n2 eieren\n100ml melk\nKaneel\nSuiker\nBoter',
+                    instructions: '1. Mix eieren, melk en kaneel\n2. Dip het brood in het mengsel\n3. Bak goudbruin in boter\n4. Bestrooi met poedersuiker',
+                    prep_time: 5,
+                    cook_time: 10,
+                    servings: 2,
+                    difficulty: 'easy',
+                    category_id: 1 // Ontbijt
+                }
+            ];
+
+            const demo = demos[Math.floor(Math.random() * demos.length)];
+            Object.entries(demo).forEach(([key, value]) => {
+                const field = createForm.elements[key];
+                if (field) field.value = value;
+            });
+
+            showToast('Voorbeelddata ingevuld', 'success');
+        };
+
+        // Carousel functions
+        const shuffleRecipes = () => {
+            loadRecipes({}, true);
+        };
+        
+        const startCarousel = () => {
+            if (carouselInterval) clearInterval(carouselInterval);
+            carouselInterval = setInterval(() => {
+                if (!carouselPaused) {
+                    shuffleRecipes();
+                }
+            }, CAROUSEL_INTERVAL);
+        };
+        
+        const toggleCarousel = () => {
+            carouselPaused = !carouselPaused;
+            carouselIndicator.classList.toggle('paused', carouselPaused);
+            carouselToggle.innerHTML = carouselPaused 
+                ? '<span>▶️</span> Start' 
+                : '<span>⏸️</span> Pauze';
+            
+            showToast(carouselPaused ? 'Auto-wissel gepauzeerd' : 'Auto-wissel hervat', 'success');
+        };
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Enter key for search
+        document.getElementById('search').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') applyFilters();
+        });
+
+        // Initial load
+        loadCategories();
+        loadRecipes();
+        
+        // Start carousel after initial load
+        setTimeout(startCarousel, 2000);
+    </script>
+</body>
+</html>

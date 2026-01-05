@@ -232,6 +232,109 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
+/**
+ * Data Export Endpoint - JSON format
+ * Exporteert alle recipes en categories als JSON
+ * @route GET /api/export/json
+ */
+app.get('/api/export/json', async (req, res) => {
+    try {
+        const [recipes] = await db.query(`
+            SELECT r.*, c.name as category_name 
+            FROM recipes r
+            LEFT JOIN categories c ON r.category_id = c.id
+            WHERE r.deleted_at IS NULL
+            ORDER BY r.title ASC
+        `);
+        
+        const [categories] = await db.query(`
+            SELECT * FROM categories 
+            WHERE deleted_at IS NULL
+            ORDER BY name ASC
+        `);
+        
+        const exportData = {
+            exportedAt: new Date().toISOString(),
+            recipes: recipes,
+            categories: categories
+        };
+        
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Disposition', 'attachment; filename=recipes-export.json');
+        res.json(exportData);
+    } catch (error) {
+        console.error('Error in JSON export:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Fout bij exporteren van data'
+        });
+    }
+});
+
+/**
+ * Data Export Endpoint - CSV format
+ * Exporteert alle recipes als CSV bestand
+ * @route GET /api/export/csv
+ */
+app.get('/api/export/csv', async (req, res) => {
+    try {
+        const [recipes] = await db.query(`
+            SELECT r.id, r.title, r.description, r.ingredients, r.instructions,
+                   r.prep_time, r.cook_time, r.servings, r.difficulty,
+                   c.name as category_name, r.created_at
+            FROM recipes r
+            LEFT JOIN categories c ON r.category_id = c.id
+            WHERE r.deleted_at IS NULL
+            ORDER BY r.title ASC
+        `);
+        
+        // CSV header
+        const headers = ['ID', 'Title', 'Description', 'Ingredients', 'Instructions', 
+                        'Prep Time (min)', 'Cook Time (min)', 'Servings', 'Difficulty', 
+                        'Category', 'Created At'];
+        
+        // Escape CSV values (handle commas, quotes, newlines)
+        const escapeCSV = (value) => {
+            if (value === null || value === undefined) return '';
+            const str = String(value);
+            if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                return `"${str.replace(/"/g, '""')}"`;
+            }
+            return str;
+        };
+        
+        // Build CSV content
+        let csv = headers.join(',') + '\n';
+        
+        recipes.forEach(r => {
+            const row = [
+                r.id,
+                escapeCSV(r.title),
+                escapeCSV(r.description),
+                escapeCSV(r.ingredients),
+                escapeCSV(r.instructions),
+                r.prep_time,
+                r.cook_time,
+                r.servings,
+                r.difficulty,
+                escapeCSV(r.category_name),
+                r.created_at ? new Date(r.created_at).toISOString() : ''
+            ];
+            csv += row.join(',') + '\n';
+        });
+        
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename=recipes-export.csv');
+        res.send(csv);
+    } catch (error) {
+        console.error('Error in CSV export:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Fout bij exporteren van data'
+        });
+    }
+});
+
 // Apply rate limiting to API routes
 app.use('/api', apiLimiter);
 

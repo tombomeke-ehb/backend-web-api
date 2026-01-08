@@ -1,3 +1,24 @@
+// Definitief verwijderen (hard delete)
+export const hardDeleteRecipe = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                success: false,
+                errors: formatValidationErrors(errors)
+            });
+        }
+        const id = req.params.id;
+        const deleted = await Recipe.hardDelete(id);
+        if (deleted) {
+            res.json({ success: true, message: 'Recipe definitief verwijderd' });
+        } else {
+            res.status(404).json({ success: false, message: 'Recipe niet gevonden' });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Fout bij definitief verwijderen', error: error.message });
+    }
+};
 import { validationResult } from 'express-validator';
 import Recipe from '../models/Recipe.js';
 

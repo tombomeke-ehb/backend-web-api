@@ -7,6 +7,11 @@ import db from '../config/database.js';
  * Ondersteunt soft delete (data markeren als verwijderd i.p.v. permanent verwijderen)
  */
 class Recipe {
+        // Hard delete: verwijder recipe permanent uit de database
+        static async hardDelete(id) {
+            const [result] = await db.query('DELETE FROM recipes WHERE id = ?', [id]);
+            return result.affectedRows > 0;
+        }
     /**
      * Haal alle recipes op met optionele filters, pagination en sorting
      * Ondersteunt multi-field search als extra feature

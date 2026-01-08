@@ -1533,81 +1533,93 @@
         }
 
         async function loadDeletedRecipes() {
-            try {
-                const json = await fetchAPI(`${API}/recipes/deleted`);
-                const recipes = json.data || [];
-                const container = document.getElementById('deleted-recipes');
-                
-                if (!container) return;
-                
-                if (recipes.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state" style="padding: 24px;">
-                            <div class="empty-state-icon">✨</div>
-                            <div class="empty-state-text">Geen verwijderde recepten - alles is bewaard!</div>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                container.innerHTML = `
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="border-bottom: 2px solid var(--border);">
-                                <th style="text-align: left; padding: 12px; font-weight: 600;">Recept</th>
-                                <th style="text-align: left; padding: 12px; font-weight: 600;">Verwijderd op</th>
-                                <th style="text-align: right; padding: 12px; font-weight: 600;">Actie</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${recipes.map(r => `
-                                <tr style="border-bottom: 1px solid var(--border);">
-                                    <td style="padding: 12px;">
-                                        <span style="font-weight: 600;">${r.title}</span>
-                                        ${r.category_name ? `<span class="badge badge-category" style="margin-left: 8px;">${r.category_name}</span>` : ''}
-                                    </td>
-                                    <td style="padding: 12px; color: var(--text-muted);">
-                                        ${new Date(r.deleted_at).toLocaleDateString('nl-NL', { 
-                                            year: 'numeric', month: 'short', day: 'numeric', 
-                                            hour: '2-digit', minute: '2-digit' 
-                                        })}
-                                    </td>
-                                    <td style="padding: 12px; text-align: right;">
-                                        <button class="btn btn-accent btn-sm" onclick="restoreRecipe(${r.id})">
-                                            <span>♻️</span> Herstel
-                                        </button>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-            } catch (e) {
-                console.error('loadDeletedRecipes error:', e);
-                const container = document.getElementById('deleted-recipes');
-                if (container) {
-                    container.innerHTML = `
-                        <div class="empty-state" style="padding: 24px;">
-                            <div class="empty-state-icon">❌</div>
-                            <div class="empty-state-text">${e.message}</div>
-                        </div>
-                    `;
-                }
-            }
+    try {
+        const json = await fetchAPI(`${API}/recipes/deleted`);
+        const recipes = json.data || [];
+        const container = document.getElementById('deleted-recipes');
+        if (!container) return;
+        if (recipes.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state" style="padding: 24px;">
+                    <div class="empty-state-icon">✨</div>
+                    <div class="empty-state-text">Geen verwijderde recepten - alles is bewaard!</div>
+                </div>
+            `;
+            return;
         }
+        container.innerHTML = `
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border);">
+                        <th style="text-align: left; padding: 12px; font-weight: 600;">Recept</th>
+                        <th style="text-align: left; padding: 12px; font-weight: 600;">Verwijderd op</th>
+                        <th style="text-align: right; padding: 12px; font-weight: 600;">Actie</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${recipes.map(r => `
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 12px;">
+                                <span style="font-weight: 600;">${r.title}</span>
+                                ${r.category_name ? `<span class=\"badge badge-category\" style=\"margin-left: 8px;\">${r.category_name}</span>` : ''}
+                            </td>
+                            <td style="padding: 12px; color: var(--text-muted);">
+                                ${new Date(r.deleted_at).toLocaleDateString('nl-NL', { 
+                                    year: 'numeric', month: 'short', day: 'numeric', 
+                                    hour: '2-digit', minute: '2-digit' 
+                                })}
+                            </td>
+                            <td style="padding: 12px; text-align: right; display: flex; gap: 8px; justify-content: flex-end;">
+                                <button class=\"btn btn-accent btn-sm\" onclick=\"restoreRecipe(${r.id})\">
+                                    <span>♻️</span> Herstel
+                                </button>
+                                <button class=\"btn btn-danger btn-sm\" onclick=\"hardDeleteRecipe(${r.id}, '${r.title.replace(/'/g, "\\'")}')\">
+                                    <span>🗑️</span> Definitief verwijderen
+                                </button>
+                            </td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
+    } catch (e) {
+        console.error('loadDeletedRecipes error:', e);
+        const container = document.getElementById('deleted-recipes');
+        if (container) {
+            container.innerHTML = `<div style="padding: 24px; color: var(--danger);">Kon verwijderde recepten niet laden</div>`;
+        }
+    }
+}
 
-        async function restoreRecipe(id) {
-            try {
-                await fetchAPI(`${API}/recipes/${id}/restore`, { method: 'POST' });
-                showToast('Recept succesvol hersteld!', 'success');
-                loadDeletedRecipes();
-                loadRecipes();
-                loadCategories();
-                loadStats();
-            } catch (e) {
-                showToast(e.message, 'error');
-            }
+// Hard delete functie (globaal)
+async function hardDeleteRecipe(id, title) {
+    if (!confirm(`Weet je zeker dat je het recept '${title}' definitief wilt verwijderen? Dit kan niet ongedaan worden gemaakt!`)) return;
+    try {
+        const res = await fetch(`${API}/recipes/${id}/hard`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+            showToast('Recept definitief verwijderd', 'success');
+            loadDeletedRecipes();
+        } else {
+            showToast(json.message || 'Kon niet verwijderen', 'error');
         }
+    } catch (e) {
+        showToast(e.message, 'error');
+    }
+}
+
+async function restoreRecipe(id) {
+    try {
+        await fetchAPI(`${API}/recipes/${id}/restore`, { method: 'POST' });
+        showToast('Recept succesvol hersteld!', 'success');
+        loadDeletedRecipes();
+        loadRecipes();
+        loadCategories();
+        loadStats();
+    } catch (e) {
+        showToast(e.message, 'error');
+    }
+}
 
         async function deleteRecipe(id, title) {
             if (!confirm(`Weet je zeker dat je "${title}" wilt verwijderen?\n\nHet recept kan later worden hersteld via het Dashboard.`)) {

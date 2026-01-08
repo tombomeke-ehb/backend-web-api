@@ -85,6 +85,7 @@ Bezoek `http://localhost:3000` in je browser voor de volledige interactieve API 
 
 - **Soft Delete** - Data markeren als verwijderd i.p.v. permanent verwijderen
   - `DELETE /api/recipes/:id` - soft delete
+  - `DELETE /api/recipes/:id/hard` - hard delete (permanent)
   - `POST /api/recipes/:id/restore` - herstel verwijderde items
   - `GET /api/recipes/deleted` - bekijk verwijderde items
 

@@ -32,24 +32,17 @@ De Recipe Manager API is een complete REST API voor het beheren van recepten en 
 
 ### Extra Features
 
-- **Geavanceerde Validatie**
   - Unieke constraints (category namen moeten uniek zijn)
   - Relatie validatie (prevent delete with foreign keys)
   - Custom validatie (totale tijd >= 1 minuut)
   - Formaat checks (regex patterns)
 
-- **Multi-Field Search** - Zoekt simultaan in title, description en ingredients
 
-- **Sorting Support** - Sort op title, prep_time, cook_time, created_at, servings
 
-- **Filtering** - Filter op difficulty level en category_id
 
-- **Enhanced Responses** - Recipe count per category, volledige relatie info
 
-## Technische Requirements
-
-- **Node.js**: versie 20.0.0 of hoger
-- **Express**: Web framework
+  - `DELETE /api/recipes/:id` - soft delete
+  - `DELETE /api/recipes/:id/hard` - hard delete (permanent)
 - **MySQL**: Database support (lokaal en cloud)
 - **HTTP Verbs**: Correct gebruik van GET, POST, PUT, DELETE
 - **REST API**: Follows REST design principles

@@ -28,6 +28,7 @@ export const getAllRecipes = async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
+            console.warn('Validatiefout in getAllRecipes:', formatValidationErrors(errors));
             return res.status(400).json({
                 success: false,
                 errors: formatValidationErrors(errors)
@@ -44,8 +45,9 @@ export const getAllRecipes = async (req, res) => {
             order: req.query.order || 'desc'
         };
 
+
         const result = await Recipe.findAll(options);
-        
+
         res.json({
             success: true,
             data: result.recipes,

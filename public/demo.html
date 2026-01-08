@@ -774,7 +774,7 @@
                         <select id="sort">
                             <option value="created_at">Nieuwste</option>
                             <option value="title">Naam (A-Z)</option>
-                            <option value="prep_time">Snelste eerst</option>
+                            <option value="total_time">Snelste eerst</option>
                             <option value="servings">Meeste porties</option>
                         </select>
                     </div>
@@ -982,7 +982,6 @@
     <div id="toast" class="toast"></div>
 
     <script>
-        console.log('=== Demo.html script starting ===');
         // Log access to server
         new Image().src = '/api/health';
         const API = '/api';
@@ -1141,24 +1140,26 @@
         }
 
         // Load recipes
-        async function loadRecipes(filters = {}, shuffle = false) {
-            // Add shuffle animation
-            if (shuffle) {
-                const cards = recipeGrid.querySelectorAll('.recipe-card');
-                cards.forEach(card => card.classList.add('shuffling'));
-                await new Promise(resolve => setTimeout(resolve, 300));
-            }
-            
+        // Globale filters state
+        let currentFilters = {};
+
+        async function loadRecipes(filters = null, shuffle = false) {
+            // Gebruik altijd de actuele filters, tenzij expliciet andere filters worden meegegeven
+            if (filters === null) filters = { ...currentFilters };
+            else currentFilters = { ...filters };
+
+
             recipeGrid.innerHTML = '<div class="loading"><div class="spinner"></div></div>';
 
             try {
                 // For carousel: use random offset when shuffling
+                let queryFilters = { ...currentFilters };
                 if (shuffle && totalRecipes > 12) {
                     currentOffset = Math.floor(Math.random() * (totalRecipes - 11));
-                    filters.offset = currentOffset;
+                    queryFilters.offset = currentOffset;
                 }
-                
-                const params = new URLSearchParams({ limit: 12, ...filters });
+
+                const params = new URLSearchParams({ limit: 12, ...queryFilters });
                 const json = await fetchAPI(`${API}/recipes?${params}`);
                 const recipes = json.data || [];
 
@@ -1221,6 +1222,19 @@
             if (difficulty) filters.difficulty = difficulty;
             if (category) filters.category_id = category;
             if (sort) filters.sort = sort;
+
+            // Zet de juiste order-parameter afhankelijk van de sorteeroptie
+            if (sort === 'title') {
+                filters.order = 'asc'; // Naam (A-Z)
+            } else if (sort === 'total_time') {
+                filters.order = 'asc'; // Snelste eerst
+            } else if (sort === 'servings') {
+                filters.order = 'desc'; // Meeste porties
+            } else if (sort === 'created_at') {
+                filters.order = 'desc'; // Nieuwste
+            } else {
+                filters.order = 'desc';
+            }
 
             loadRecipes(filters);
         }
@@ -1408,7 +1422,13 @@
 
         // Carousel functions
         function shuffleRecipes() {
-            loadRecipes({}, true);
+            // Gebruik altijd de huidige filters bij shufflen, inclusief sortering
+            // Voeg expliciet de huidige sorteeroptie toe als deze ontbreekt
+            if (!currentFilters.sort) {
+                const sort = document.getElementById('sort').value;
+                if (sort) currentFilters.sort = sort;
+            }
+            loadRecipes(null, true);
         }
         
         function startCarousel() {
@@ -1442,10 +1462,8 @@
 
         // Dashboard functions (defined before initial load)
         async function loadHealthCheck() {
-            console.log('loadHealthCheck called');
             try {
                 const json = await fetchAPI(`${API}/health`);
-                console.log('Health response:', json);
                 const statusEl = document.getElementById('health-status');
                 if (statusEl) {
                     statusEl.innerHTML = `<span style="color: var(--accent); font-weight: 700;">● Online</span>`;
@@ -1469,7 +1487,6 @@
             try {
                 const json = await fetchAPI(`${API}/stats`);
                 const data = json.data;
-                console.log('Stats data:', data);
                 
                 const overviewEl = document.getElementById('stats-overview');
                 if (overviewEl) {
@@ -1481,12 +1498,10 @@
                 
                 // Difficulty chart
                 const difficulties = data.recipes.byDifficulty || {};
-                console.log('Difficulties:', difficulties);
                 const easy = parseInt(difficulties.easy || 0, 10);
                 const medium = parseInt(difficulties.medium || 0, 10);
                 const hard = parseInt(difficulties.hard || 0, 10);
                 const total = easy + medium + hard;
-                console.log('Total difficulties:', {easy, medium, hard, total});
                 
                 const chartEl = document.getElementById('difficulty-chart');
                 if (chartEl) {
@@ -1631,30 +1646,25 @@
 
         // Initial load
         window.callCount = 0;
-        console.log('Starting initial load...');
         window.callCount++;
-        console.log('About to call loadCategories, count=' + window.callCount);
         const testDisplay = document.getElementById('test-display');
         if (testDisplay) testDisplay.textContent = 'Script initialized';
-        
+
         // Direct API test
-        console.log('Making direct fetch call...');
         fetch('/api/health').then(r => {
-            console.log('API response:', r.status);
             window.apiWorked = true;
         }).catch(e => {
             console.error('API error:', e);
             window.apiWorked = false;
         });
-        
+
         try { loadCategories(); window.callCount++; } catch(e) { console.error('loadCategories error:', e); window.callCount += 100; }
-        try { loadRecipes(); window.callCount++; } catch(e) { console.error('loadRecipes error:', e); window.callCount += 100; }
+        try { loadRecipes(null); window.callCount++; } catch(e) { console.error('loadRecipes error:', e); window.callCount += 100; }
         try { loadHealthCheck(); window.callCount++; } catch(e) { console.error('loadHealthCheck error:', e); window.callCount += 100; }
         try { loadStats(); window.callCount++; } catch(e) { console.error('loadStats error:', e); window.callCount += 100; }
         try { loadDeletedRecipes(); window.callCount++; } catch(e) { console.error('loadDeletedRecipes error:', e); window.callCount += 100; }
-        console.log('Initial load complete, count=' + window.callCount);
         if (testDisplay) testDisplay.textContent = 'Calls: ' + window.callCount;
-        
+
         // Start carousel after initial load
         setTimeout(startCarousel, 2000);
     </script>

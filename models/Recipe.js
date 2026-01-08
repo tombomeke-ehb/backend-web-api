@@ -23,6 +23,8 @@ class Recipe {
      * @returns {Object} Object met recipes array en pagination metadata
      */
     static async findAll(options = {}) {
+            // Allowed sort fields (inclusief total_time)
+            const allowedSortFields = ['title', 'prep_time', 'cook_time', 'created_at', 'servings', 'total_time'];
         const {
             limit = 10,
             offset = 0,
@@ -59,19 +61,31 @@ class Recipe {
             params.push(difficulty);
         }
 
+        // Debug: log query vóór sortering
+
         if (category_id) {
             query += ` AND r.category_id = ?`;
             params.push(category_id);
         }
 
         // Sorting (extra feature)
-        const allowedSortFields = ['title', 'prep_time', 'cook_time', 'created_at', 'servings'];
-        const sortField = allowedSortFields.includes(sort) ? sort : 'created_at';
+        // allowedSortFields is al eerder gedeclareerd, niet opnieuw declareren
+        let sortField = allowedSortFields.includes(sort) ? sort : 'created_at';
         const sortOrder = order === 'asc' ? 'ASC' : 'DESC';
-        
-        query += ` ORDER BY r.${sortField} ${sortOrder}`;
+
+        if (sortField === 'title') {
+            // Case-insensitive, NL-collatie sortering
+            query += ` ORDER BY LOWER(r.title) COLLATE utf8mb4_unicode_ci ${sortOrder}`;
+        } else if (sortField === 'total_time') {
+            // Sorteer op som van prep_time + cook_time, gebruik COALESCE om null te voorkomen
+            query += ` ORDER BY (COALESCE(r.prep_time,0) + COALESCE(r.cook_time,0)) ${sortOrder}`;
+        } else {
+            query += ` ORDER BY r.${sortField} ${sortOrder}`;
+        }
         query += ` LIMIT ? OFFSET ?`;
         params.push(parseInt(limit), parseInt(offset));
+
+        // Debug: log uiteindelijke query en parameters
 
         const [rows] = await db.query(query, params);
         

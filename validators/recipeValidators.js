@@ -159,7 +159,7 @@ export const listRecipesValidation = [
     
     query('sort')
         .optional()
-        .isIn(['title', 'prep_time', 'cook_time', 'created_at', 'servings']).withMessage('Sort veld is ongeldig'),
+        .isIn(['title', 'prep_time', 'cook_time', 'created_at', 'servings', 'total_time']).withMessage('Sort veld is ongeldig'),
     
     query('order')
         .optional()

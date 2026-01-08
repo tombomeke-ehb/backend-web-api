@@ -1,3 +1,8 @@
+// Validatie voor hard delete
+export const hardDeleteRecipeValidation = [
+    param('id')
+        .isInt({ min: 1 }).withMessage('Recipe ID moet een positief getal zijn')
+];
 import { body, query, param } from 'express-validator';
 
 /**

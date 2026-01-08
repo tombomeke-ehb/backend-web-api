@@ -1,3 +1,5 @@
+import { hardDeleteRecipeValidation } from '../validators/recipeValidators.js';
+import { hardDeleteRecipe } from '../controllers/recipeController.js';
 /**
  * Recipe Routes
  * Definieert alle HTTP endpoints voor recipe CRUD operaties
@@ -23,6 +25,9 @@ import {
 } from '../validators/recipeValidators.js';
 
 const router = express.Router();
+
+// DELETE /api/recipes/:id/hard - Definitief verwijderen van een recipe (hard delete)
+router.delete('/:id/hard', hardDeleteRecipeValidation, hardDeleteRecipe);
 
 // GET /api/recipes/deleted - Lijst van verwijderde recipes (moet voor /:id route)
 router.get('/deleted', getDeletedRecipes);

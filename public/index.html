@@ -703,6 +703,37 @@
             </table>
         </div>
     </div>
+    
+        <div class="endpoint">
+            <h3><span class="method delete">DELETE</span> Recipe definitief verwijderen (Hard Delete)</h3>
+            <div class="url">/api/recipes/:id/hard</div>
+            <div class="description">
+                Verwijder een recipe <strong>permanent</strong> uit de database. <br>
+                <strong>Let op:</strong> Dit kan <u>niet</u> ongedaan worden gemaakt!
+            </div>
+            <div class="params">
+                <h4>URL Parameters:</h4>
+                <table>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Beschrijving</th>
+                    </tr>
+                    <tr>
+                        <td><code>id</code> <span class="badge required">required</span></td>
+                        <td>integer</td>
+                        <td>Het ID van de recipe</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="response">
+                <h4>Voorbeeld Response:</h4>
+                <pre>{
+      "success": true,
+      "message": "Recipe definitief verwijderd"
+    }</pre>
+            </div>
+        </div>
 
     <div class="endpoint">
         <h3><span class="method get">GET</span> Verwijderde recipes ophalen</h3>

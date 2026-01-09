@@ -10,7 +10,7 @@ Zorg ervoor dat je het volgende hebt geïnstalleerd:
 
 - **Node.js**: versie 20.0.0 of hoger - [download](https://nodejs.org)
 - **npm**: wordt meegeleverd met Node.js
-- **MySQL Database**: lokaal of cloud (Aiven, AWS RDS, Google Cloud SQL)
+- **SQLite**: wordt automatisch aangemaakt, geen installatie nodig
 
 Controleer versies:
 ```bash
@@ -33,37 +33,9 @@ cd backend-web-api
 npm install
 ```
 
-### 3. Environment Configuratie
+### 3. Database Opzetten (SQLite)
 
-Kopieer `.env.example` naar `.env`:
-```bash
-cp .env.example .env
-```
-
-Edit `.env` met jouw database credentials:
-
-**Lokale MySQL:**
-```env
-PORT=3000
-DB_HOST=localhost
-DB_USERNAME=root
-DB_PASSWORD=jouw_wachtwoord
-DB_DATABASE=recipe_manager
-DB_PORT=3306
-```
-
-**Cloud Database (Aiven):**
-```env
-PORT=3000
-DB_HOST=jouw-db.aivencloud.com
-DB_USERNAME=avnadmin
-DB_PASSWORD=jouw_wachtwoord
-DB_DATABASE=defaultdb
-DB_PORT=10547
-DB_SSL_CA=./config/private/ca.pem
-```
-
-### 4. Database Opzetten
+De database wordt automatisch aangemaakt als `dev.sqlite3` in de hoofdmap.
 
 ```bash
 node setup-database.js
@@ -72,10 +44,9 @@ node setup-database.js
 Dit script:
 - Maakt tabellen aan (recipes, categories)
 - Voegt voorbeeld data toe
-- Werkt met lokale en cloud databases
 - Kan meerdere keren uitgevoerd worden
 
-### 5. Server Starten
+### 4. Server Starten
 
 Development mode (auto-reload):
 ```bash
@@ -93,16 +64,12 @@ De API is beschikbaar op: `http://localhost:3000`
 
 ### Database Connectie Mislukt
 
-**Symptoom:** `Error: connect ECONNREFUSED 127.0.0.1:3306`
+**Symptoom:** Foutmelding over database connectie
 
 **Oplossing:**
-- Controleer of MySQL server draait
-  - Windows: Services app (services.msc)
-  - Mac: System Preferences > MySQL
-  - Linux: `sudo service mysql status`
-- Verifieer `.env` credentials
-- Test connectie: `mysql -h localhost -u root -p`
-- Check DB_PORT (standaard: 3306)
+- Controleer of het bestand `dev.sqlite3` bestaat (wordt automatisch aangemaakt)
+- Controleer of je Node.js versie >= 20 gebruikt
+- Controleer of je `npm install` hebt uitgevoerd
 
 ### Poort 3000 Al In Gebruik
 
@@ -116,10 +83,9 @@ De API is beschikbaar op: `http://localhost:3000`
 
 ### Setup Script Werkt Niet
 
-- Zorg dat `.env` correct ingesteld is
-- Controleer databasenaam in `.env`
-- Verifieer MySQL user rechten (CREATE, INSERT, DROP)
-- Zorg dat de database server draait
+- Zorg dat je dependencies geïnstalleerd zijn (`npm install`)
+- Controleer Node.js versie
+- Verwijder eventueel het oude `dev.sqlite3` bestand en probeer opnieuw
 
 ## Database Schema
 
@@ -136,44 +102,33 @@ Voor complete database schema en veldtypes, zie [REQUIREMENTS.md](REQUIREMENTS.m
 ## Licentie
 
 ISC
+
+**Voorbeeld tabellen:**
 ```sql
+CREATE TABLE categories (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE,
+  description TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE recipes (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(200) NOT NULL,
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
   description TEXT,
   ingredients TEXT NOT NULL,
   instructions TEXT NOT NULL,
-  prep_time INT NOT NULL,
-  cook_time INT NOT NULL,
-  servings INT NOT NULL,
-  difficulty ENUM('easy', 'medium', 'hard') DEFAULT 'medium',
-  category_id INT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (category_id) REFERENCES categories(id)
+  prep_time INTEGER NOT NULL,
+  cook_time INTEGER NOT NULL,
+  servings INTEGER NOT NULL,
+  difficulty TEXT CHECK(difficulty IN ('easy','medium','hard')) DEFAULT 'medium',
+  category_id INTEGER,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
 );
 ```
-
-**Categories Table:**
-```sql
-CREATE TABLE categories (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL UNIQUE,
-  description VARCHAR(500),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-```
-
-## Code Kwaliteit
-
-- Error Handling: Try-catch blocks in controllers
-- Logging: Console logs voor debugging
-- Validatie: Express-validator input validatie
-- Security: Prepared statements (SQL injection preventie)
-- Code Structuur: MVC pattern
-- Documentation: Inline comments met bronvermelding
-- Environment Variables: Gevoelige data in .env
 
 ## Licentie & Contact
 

@@ -1,6 +1,6 @@
 # Recipe Manager API
 
-Een professionele, database-driven REST API gebouwd met Node.js, Express en MySQL voor het beheren van recepten en receptcategorieën.
+Een professionele, database-driven REST API gebouwd met Node.js, Express en SQLite voor het beheren van recepten en receptcategorieën.
 
 ## Overzicht
 
@@ -8,7 +8,7 @@ Dit project implementeert een volledige REST API met CRUD-operaties voor twee en
 
 **Status:** Production Ready
 
-De applicatie ondersteunt zowel lokale MySQL databases als cloud-gebaseerde databases (Aiven, AWS RDS, Google Cloud SQL) met automatische SSL-configuratie.
+De applicatie gebruikt standaard SQLite als database (geen aparte installatie nodig, alles werkt out-of-the-box).
 
 ## Documentatie
 
@@ -21,13 +21,10 @@ De applicatie ondersteunt zowel lokale MySQL databases als cloud-gebaseerde data
 # 1. Dependencies installeren
 npm install
 
-# 2. Environment configureren (pas .env aan met jouw database credentials)
-cp .env.example .env
-
-# 3. Database opzetten
+# 2. Database opzetten (SQLite)
 node setup-database.js
 
-# 4. Server starten
+# 3. Server starten
 npm run dev
 ```
 
@@ -105,7 +102,7 @@ Bezoek `http://localhost:3000` in je browser voor de volledige interactieve API 
 
 - **Node.js**: versie 20.0.0 of hoger
 - **Express**: Web framework
-- **MySQL**: Database support (lokaal en cloud)
+- **SQLite**: Database (geen installatie nodig)
 - **HTTP Verbs**: Correct gebruik van GET, POST, PUT, DELETE
 - **REST API**: Follows REST design principles
 
@@ -115,14 +112,15 @@ Voor gedetailleerde installatie instructies, zie [INSTALLATIE.md](INSTALLATIE.md
 
 ### Vereisten
 - Node.js versie 20 of hoger
-- MySQL server (lokaal of cloud zoals Aiven)
 - npm of yarn package manager
 
 ### Quick Start
 
-**Stap 1: Environment configureren**
+**Stap 1: Dependencies installeren**
 
-Pas `.env` aan met jouw database credentials (ondersteunt lokale én cloud databases met SSL)
+```bash
+npm install
+```
 
 **Stap 2: Database opzetten**
 
@@ -130,13 +128,7 @@ Pas `.env` aan met jouw database credentials (ondersteunt lokale én cloud datab
 node setup-database.js
 ```
 
-**Stap 3: Dependencies installeren**
-
-```bash
-npm install
-```
-
-**Stap 4: Server starten**
+**Stap 3: Server starten**
 
 ```bash
 npm run dev
@@ -148,10 +140,7 @@ Voor meer details en troubleshooting, zie [INSTALLATIE.md](INSTALLATIE.md).
 
 ### Database Opties
 
-Het project ondersteunt:
-- **Lokale MySQL** - Standaard setup
-- **Cloud databases** - Aiven, AWS RDS, Google Cloud SQL
-- **SSL verbindingen** - Automatisch gedetecteerd via `DB_SSL_CA` environment variable
+Het project gebruikt standaard SQLite. Wil je MySQL gebruiken, pas dan de database configuratie aan in `config/database.js` en `.env`.
 
 ## API Documentatie
 

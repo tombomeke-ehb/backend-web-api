@@ -25,8 +25,8 @@ import dotenv from 'dotenv';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import cors from 'cors';
-import { testConnection } from './config/database.js';
-import db from './config/database.js';
+import dbPromise from './config/database.sqlite.js';
+import { testConnection } from './config/database.sqlite.js';
 import recipesRouter from './routes/recipes.js';
 import categoriesRouter from './routes/categories.js';
 import { fileURLToPath } from 'url';
@@ -142,7 +142,8 @@ app.get('/api/health', async (req, res) => {
     
     try {
         // Test database connectie
-        await db.query('SELECT 1');
+        const db = await dbPromise;
+        await db.get('SELECT 1');
         
         res.json({
             success: true,
@@ -171,8 +172,9 @@ app.get('/api/health', async (req, res) => {
  */
 app.get('/api/stats', async (req, res) => {
     try {
+        const db = await dbPromise;
         // Haal statistieken op uit de database
-        const [[recipeStats]] = await db.query(`
+        const recipeStats = await db.get(`
             SELECT 
                 COUNT(*) as total_recipes,
                 AVG(prep_time + cook_time) as avg_total_time,
@@ -183,11 +185,11 @@ app.get('/api/stats', async (req, res) => {
             FROM recipes
         `);
         
-        const [[categoryStats]] = await db.query(`
+        const categoryStats = await db.get(`
             SELECT COUNT(*) as total_categories FROM categories
         `);
         
-        const [topCategories] = await db.query(`
+        const topCategories = await db.all(`
             SELECT c.name, COUNT(r.id) as recipe_count
             FROM categories c
             LEFT JOIN recipes r ON c.id = r.category_id
@@ -196,7 +198,7 @@ app.get('/api/stats', async (req, res) => {
             LIMIT 5
         `);
         
-        const [recentRecipes] = await db.query(`
+        const recentRecipes = await db.all(`
             SELECT title, created_at FROM recipes 
             ORDER BY created_at DESC 
             LIMIT 5
@@ -240,6 +242,7 @@ app.get('/api/stats', async (req, res) => {
  */
 app.get('/api/export/json', async (req, res) => {
     try {
+        const db = await dbPromise;
         const [recipes] = await db.query(`
             SELECT r.*, c.name as category_name 
             FROM recipes r
@@ -279,6 +282,7 @@ app.get('/api/export/json', async (req, res) => {
  */
 app.get('/api/export/csv', async (req, res) => {
     try {
+        const db = await dbPromise;
         const [recipes] = await db.query(`
             SELECT r.id, r.title, r.description, r.ingredients, r.instructions,
                    r.prep_time, r.cook_time, r.servings, r.difficulty,

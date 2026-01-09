@@ -10,7 +10,7 @@ Zorg ervoor dat je het volgende hebt geïnstalleerd:
 
 - **Node.js**: versie 20.0.0 of hoger - [download](https://nodejs.org)
 - **npm**: wordt meegeleverd met Node.js
-- **SQLite**: wordt automatisch aangemaakt, geen installatie nodig
+- **SQLite**: het databasebestand `dev.sqlite3` wordt meegeleverd in de repository
 
 Controleer versies:
 ```bash
@@ -33,20 +33,7 @@ cd backend-web-api
 npm install
 ```
 
-### 3. Database Opzetten (SQLite)
-
-De database wordt automatisch aangemaakt als `dev.sqlite3` in de hoofdmap.
-
-```bash
-node setup-database.js
-```
-
-Dit script:
-- Maakt tabellen aan (recipes, categories)
-- Voegt voorbeeld data toe
-- Kan meerdere keren uitgevoerd worden
-
-### 4. Server Starten
+### 3. Server Starten
 
 Development mode (auto-reload):
 ```bash
@@ -67,7 +54,7 @@ De API is beschikbaar op: `http://localhost:3000`
 **Symptoom:** Foutmelding over database connectie
 
 **Oplossing:**
-- Controleer of het bestand `dev.sqlite3` bestaat (wordt automatisch aangemaakt)
+- Controleer of het bestand `dev.sqlite3` aanwezig is (wordt meegeleverd)
 - Controleer of je Node.js versie >= 20 gebruikt
 - Controleer of je `npm install` hebt uitgevoerd
 
@@ -80,12 +67,6 @@ De API is beschikbaar op: `http://localhost:3000`
 - Of stop het process dat poort 3000 gebruikt:
   - Windows: `netstat -ano | findstr :3000`
   - Mac/Linux: `lsof -i :3000`
-
-### Setup Script Werkt Niet
-
-- Zorg dat je dependencies geïnstalleerd zijn (`npm install`)
-- Controleer Node.js versie
-- Verwijder eventueel het oude `dev.sqlite3` bestand en probeer opnieuw
 
 ## Database Schema
 
@@ -110,7 +91,8 @@ CREATE TABLE categories (
   name TEXT NOT NULL UNIQUE,
   description TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  deleted_at DATETIME
 );
 
 CREATE TABLE recipes (
@@ -126,6 +108,7 @@ CREATE TABLE recipes (
   category_id INTEGER,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  deleted_at DATETIME,
   FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
 );
 ```

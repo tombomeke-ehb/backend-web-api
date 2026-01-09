@@ -8,7 +8,7 @@ Dit project implementeert een volledige REST API met CRUD-operaties voor twee en
 
 **Status:** Production Ready
 
-De applicatie gebruikt standaard SQLite als database (geen aparte installatie nodig, alles werkt out-of-the-box).
+De applicatie gebruikt standaard SQLite als database. Het databasebestand `dev.sqlite3` wordt meegeleverd in de repository, dus je hoeft geen database te initialiseren.
 
 ## Documentatie
 
@@ -21,10 +21,7 @@ De applicatie gebruikt standaard SQLite als database (geen aparte installatie no
 # 1. Dependencies installeren
 npm install
 
-# 2. Database opzetten (SQLite)
-node setup-database.js
-
-# 3. Server starten
+# 2. Server starten
 npm run dev
 ```
 
@@ -102,7 +99,7 @@ Bezoek `http://localhost:3000` in je browser voor de volledige interactieve API 
 
 - **Node.js**: versie 20.0.0 of hoger
 - **Express**: Web framework
-- **SQLite**: Database (geen installatie nodig)
+- **SQLite**: Database (bestand `dev.sqlite3` wordt meegeleverd)
 - **HTTP Verbs**: Correct gebruik van GET, POST, PUT, DELETE
 - **REST API**: Follows REST design principles
 
@@ -122,13 +119,7 @@ Voor gedetailleerde installatie instructies, zie [INSTALLATIE.md](INSTALLATIE.md
 npm install
 ```
 
-**Stap 2: Database opzetten**
-
-```bash
-node setup-database.js
-```
-
-**Stap 3: Server starten**
+**Stap 2: Server starten**
 
 ```bash
 npm run dev

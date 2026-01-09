@@ -1,4 +1,4 @@
-import db from '../config/database.js';
+import dbPromise from '../config/database.sqlite.js';
 
 /**
  * Category Model
@@ -19,6 +19,7 @@ class Category {
      * @returns {Object} Object met categories array en pagination metadata
      */
     static async findAll(options = {}) {
+        const db = await dbPromise;
         const {
             limit = 50,
             offset = 0,
@@ -50,7 +51,7 @@ class Category {
         query += ` LIMIT ? OFFSET ?`;
         params.push(parseInt(limit), parseInt(offset));
 
-        const [rows] = await db.query(query, params);
+        const rows = await db.all(query, params);
         
         // Tel totaal aantal categories
         let countQuery = `SELECT COUNT(*) as total FROM categories WHERE 1=1`;
@@ -66,8 +67,8 @@ class Category {
             countParams.push(searchTerm, searchTerm);
         }
         
-        const [countResult] = await db.query(countQuery, countParams);
-        const total = countResult[0].total;
+        const countRow = await db.get(countQuery, countParams);
+        const total = countRow ? countRow.total : 0;
 
         return {
             categories: rows,
@@ -87,6 +88,7 @@ class Category {
      * @returns {Object|undefined} Category object met recipe_count of undefined
      */
     static async findById(id, includeDeleted = false) {
+        const db = await dbPromise;
         let query = `
             SELECT c.*, COUNT(r.id) as recipe_count
             FROM categories c
@@ -100,8 +102,8 @@ class Category {
         
         query += ` GROUP BY c.id`;
         
-        const [rows] = await db.query(query, [id]);
-        return rows[0];
+        const row = await db.get(query, [id]);
+        return row;
     }
 
     /**
@@ -111,13 +113,14 @@ class Category {
      * @returns {Array} Array van recipe objecten
      */
     static async getRecipes(id) {
+        const db = await dbPromise;
         const query = `
             SELECT r.*
             FROM recipes r
             WHERE r.category_id = ? AND r.deleted_at IS NULL
             ORDER BY r.created_at DESC
         `;
-        const [rows] = await db.query(query, [id]);
+        const rows = await db.all(query, [id]);
         return rows;
     }
 
@@ -127,6 +130,7 @@ class Category {
      * @returns {Object} Nieuw aangemaakte category met gegenereerde ID
      */
     static async create(categoryData) {
+        const db = await dbPromise;
         const query = `
             INSERT INTO categories (name, description)
             VALUES (?, ?)
@@ -136,8 +140,8 @@ class Category {
             categoryData.description || null
         ];
 
-        const [result] = await db.query(query, values);
-        return this.findById(result.insertId);
+        const result = await db.run(query, values);
+        return this.findById(result.lastID);
     }
 
     /**
@@ -148,6 +152,7 @@ class Category {
      * @returns {Object} Geüpdatete category
      */
     static async update(id, categoryData) {
+        const db = await dbPromise;
         const fields = [];
         const values = [];
 
@@ -166,7 +171,7 @@ class Category {
         values.push(id);
         const query = `UPDATE categories SET ${fields.join(', ')} WHERE id = ?`;
         
-        await db.query(query, values);
+        await db.run(query, values);
         return this.findById(id);
     }
 
@@ -177,9 +182,10 @@ class Category {
      * @returns {boolean} True als verwijderd, false als niet gevonden
      */
     static async delete(id) {
-        const query = `UPDATE categories SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL`;
-        const [result] = await db.query(query, [id]);
-        return result.affectedRows > 0;
+        const db = await dbPromise;
+        const now = new Date().toISOString();
+        const result = await db.run(`UPDATE categories SET deleted_at = ? WHERE id = ? AND deleted_at IS NULL`, [now, id]);
+        return result.changes > 0;
     }
 
     /**
@@ -188,10 +194,10 @@ class Category {
      * @returns {Object|null} Herstelde category of null als niet gevonden
      */
     static async restore(id) {
-        const query = `UPDATE categories SET deleted_at = NULL WHERE id = ?`;
-        const [result] = await db.query(query, [id]);
+        const db = await dbPromise;
+        const result = await db.run(`UPDATE categories SET deleted_at = NULL WHERE id = ?`, [id]);
         
-        if (result.affectedRows > 0) {
+        if (result.changes > 0) {
             return this.findById(id);
         }
         return null;
@@ -205,6 +211,7 @@ class Category {
      * @returns {boolean} True als naam al bestaat, false als uniek
      */
     static async existsByName(name, excludeId = null) {
+        const db = await dbPromise;
         let query = `SELECT id FROM categories WHERE name = ? AND deleted_at IS NULL`;
         const params = [name];
         
@@ -213,8 +220,8 @@ class Category {
             params.push(excludeId);
         }
         
-        const [rows] = await db.query(query, params);
-        return rows.length > 0;
+        const row = await db.get(query, params);
+        return !!row;
     }
 }
 

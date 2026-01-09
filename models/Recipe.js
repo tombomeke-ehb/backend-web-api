@@ -1,4 +1,4 @@
-import db from '../config/database.js';
+import dbPromise from '../config/database.sqlite.js';
 
 /**
  * Recipe Model
@@ -7,11 +7,13 @@ import db from '../config/database.js';
  * Ondersteunt soft delete (data markeren als verwijderd i.p.v. permanent verwijderen)
  */
 class Recipe {
-        // Hard delete: verwijder recipe permanent uit de database
-        static async hardDelete(id) {
-            const [result] = await db.query('DELETE FROM recipes WHERE id = ?', [id]);
-            return result.affectedRows > 0;
-        }
+    // Hard delete: verwijder recipe permanent uit de database
+    static async hardDelete(id) {
+        const db = await dbPromise;
+        const result = await db.run('DELETE FROM recipes WHERE id = ?', id);
+        return result.changes > 0;
+    }
+
     /**
      * Haal alle recipes op met optionele filters, pagination en sorting
      * Ondersteunt multi-field search als extra feature
@@ -28,8 +30,8 @@ class Recipe {
      * @returns {Object} Object met recipes array en pagination metadata
      */
     static async findAll(options = {}) {
-            // Allowed sort fields (inclusief total_time)
-            const allowedSortFields = ['title', 'prep_time', 'cook_time', 'created_at', 'servings', 'total_time'];
+        const db = await dbPromise;
+        const allowedSortFields = ['title', 'prep_time', 'cook_time', 'created_at', 'servings', 'total_time'];
         const {
             limit = 10,
             offset = 0,
@@ -66,21 +68,18 @@ class Recipe {
             params.push(difficulty);
         }
 
-        // Debug: log query vóór sortering
-
         if (category_id) {
             query += ` AND r.category_id = ?`;
             params.push(category_id);
         }
 
         // Sorting (extra feature)
-        // allowedSortFields is al eerder gedeclareerd, niet opnieuw declareren
         let sortField = allowedSortFields.includes(sort) ? sort : 'created_at';
         const sortOrder = order === 'asc' ? 'ASC' : 'DESC';
 
         if (sortField === 'title') {
-            // Case-insensitive, NL-collatie sortering
-            query += ` ORDER BY LOWER(r.title) COLLATE utf8mb4_unicode_ci ${sortOrder}`;
+            // Case-insensitive, NOCASE sortering
+            query += ` ORDER BY LOWER(r.title) COLLATE NOCASE ${sortOrder}`;
         } else if (sortField === 'total_time') {
             // Sorteer op som van prep_time + cook_time, gebruik COALESCE om null te voorkomen
             query += ` ORDER BY (COALESCE(r.prep_time,0) + COALESCE(r.cook_time,0)) ${sortOrder}`;
@@ -90,18 +89,16 @@ class Recipe {
         query += ` LIMIT ? OFFSET ?`;
         params.push(parseInt(limit), parseInt(offset));
 
-        // Debug: log uiteindelijke query en parameters
+        const rows = await db.all(query, params);
 
-        const [rows] = await db.query(query, params);
-        
         // Tel totaal aantal resultaten voor pagination info
         let countQuery = `SELECT COUNT(*) as total FROM recipes r WHERE 1=1`;
         const countParams = [];
-        
+
         if (!includeDeleted) {
             countQuery += ` AND r.deleted_at IS NULL`;
         }
-        
+
         if (search) {
             countQuery += ` AND (r.title LIKE ? OR r.description LIKE ? OR r.ingredients LIKE ?)`;
             const searchTerm = `%${search}%`;
@@ -115,9 +112,9 @@ class Recipe {
             countQuery += ` AND r.category_id = ?`;
             countParams.push(category_id);
         }
-        
-        const [countResult] = await db.query(countQuery, countParams);
-        const total = countResult[0].total;
+
+        const countRow = await db.get(countQuery, countParams);
+        const total = countRow ? countRow.total : 0;
 
         return {
             recipes: rows,
@@ -137,6 +134,7 @@ class Recipe {
      * @returns {Object|undefined} Recipe object of undefined als niet gevonden
      */
     static async findById(id, includeDeleted = false) {
+        const db = await dbPromise;
         let query = `
             SELECT r.*, c.name as category_name 
             FROM recipes r
@@ -148,8 +146,8 @@ class Recipe {
             query += ` AND r.deleted_at IS NULL`;
         }
         
-        const [rows] = await db.query(query, [id]);
-        return rows[0];
+        const row = await db.get(query, [id]);
+        return row;
     }
 
     /**
@@ -158,6 +156,7 @@ class Recipe {
      * @returns {Object} Nieuw aangemaakte recipe met gegenereerde ID
      */
     static async create(recipeData) {
+        const db = await dbPromise;
         const query = `
             INSERT INTO recipes (title, description, ingredients, instructions, prep_time, cook_time, servings, difficulty, category_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -174,8 +173,8 @@ class Recipe {
             recipeData.category_id || null
         ];
 
-        const [result] = await db.query(query, values);
-        return this.findById(result.insertId);
+        const result = await db.run(query, values);
+        return this.findById(result.lastID);
     }
 
     /**
@@ -186,6 +185,7 @@ class Recipe {
      * @returns {Object} Geüpdatete recipe
      */
     static async update(id, recipeData) {
+        const db = await dbPromise;
         const fields = [];
         const values = [];
 
@@ -204,7 +204,7 @@ class Recipe {
         values.push(id);
         const query = `UPDATE recipes SET ${fields.join(', ')} WHERE id = ?`;
         
-        await db.query(query, values);
+        await db.run(query, values);
         return this.findById(id);
     }
 
@@ -215,9 +215,10 @@ class Recipe {
      * @returns {boolean} True als verwijderd, false als niet gevonden
      */
     static async delete(id) {
-        const query = `UPDATE recipes SET deleted_at = NOW() WHERE id = ? AND deleted_at IS NULL`;
-        const [result] = await db.query(query, [id]);
-        return result.affectedRows > 0;
+        const db = await dbPromise;
+        const now = new Date().toISOString();
+        const result = await db.run(`UPDATE recipes SET deleted_at = ? WHERE id = ? AND deleted_at IS NULL`, [now, id]);
+        return result.changes > 0;
     }
 
     /**
@@ -226,10 +227,10 @@ class Recipe {
      * @returns {Object|null} Herstelde recipe of null als niet gevonden
      */
     static async restore(id) {
-        const query = `UPDATE recipes SET deleted_at = NULL WHERE id = ?`;
-        const [result] = await db.query(query, [id]);
+        const db = await dbPromise;
+        const result = await db.run(`UPDATE recipes SET deleted_at = NULL WHERE id = ?`, [id]);
         
-        if (result.affectedRows > 0) {
+        if (result.changes > 0) {
             return this.findById(id);
         }
         return null;
@@ -242,9 +243,9 @@ class Recipe {
      * @returns {boolean} True als verwijderd
      */
     static async hardDelete(id) {
-        const query = `DELETE FROM recipes WHERE id = ?`;
-        const [result] = await db.query(query, [id]);
-        return result.affectedRows > 0;
+        const db = await dbPromise;
+        const result = await db.run('DELETE FROM recipes WHERE id = ?', id);
+        return result.changes > 0;
     }
 
     /**
@@ -252,6 +253,7 @@ class Recipe {
      * @returns {Array} Array van verwijderde recipes
      */
     static async findDeleted() {
+        const db = await dbPromise;
         const query = `
             SELECT r.*, c.name as category_name 
             FROM recipes r
@@ -259,7 +261,7 @@ class Recipe {
             WHERE r.deleted_at IS NOT NULL
             ORDER BY r.deleted_at DESC
         `;
-        const [rows] = await db.query(query);
+        const rows = await db.all(query);
         return rows;
     }
 }

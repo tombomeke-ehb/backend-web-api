@@ -1,3 +1,18 @@
+import { validationResult } from 'express-validator';
+import Recipe from '../models/Recipe.js';
+
+/**
+ * Formatteert validatie errors in een gestandaardiseerd formaat
+ * @param {Object} errors - Validatie errors van express-validator
+ * @returns {Array} Geformatteerde array van error objecten
+ */
+const formatValidationErrors = (errors) => {
+    return errors.array().map(err => ({
+        field: err.path,
+        message: err.msg
+    }));
+};
+
 // Definitief verwijderen (hard delete)
 export const hardDeleteRecipe = async (req, res) => {
     try {
@@ -19,20 +34,7 @@ export const hardDeleteRecipe = async (req, res) => {
         res.status(500).json({ success: false, message: 'Fout bij definitief verwijderen', error: error.message });
     }
 };
-import { validationResult } from 'express-validator';
-import Recipe from '../models/Recipe.js';
 
-/**
- * Formatteert validatie errors in een gestandaardiseerd formaat
- * @param {Object} errors - Validatie errors van express-validator
- * @returns {Array} Geformatteerde array van error objecten
- */
-const formatValidationErrors = (errors) => {
-    return errors.array().map(err => ({
-        field: err.path,
-        message: err.msg
-    }));
-};
 
 /**
  * Haal alle recipes op met optionele filtering, pagination en sorting
@@ -131,6 +133,7 @@ export const createRecipe = async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
+            console.error('Validatiefouten in createRecipe:', formatValidationErrors(errors));
             return res.status(400).json({
                 success: false,
                 errors: formatValidationErrors(errors)

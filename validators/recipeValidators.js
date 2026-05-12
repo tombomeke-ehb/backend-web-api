@@ -1,8 +1,3 @@
-// Validatie voor hard delete
-export const hardDeleteRecipeValidation = [
-    param('id')
-        .isInt({ min: 1 }).withMessage('Recipe ID moet een positief getal zijn')
-];
 import { body, query, param } from 'express-validator';
 
 /**
@@ -20,8 +15,7 @@ export const createRecipeValidation = [
     body('title')
         .trim()
         .notEmpty().withMessage('Titel is verplicht')
-        .isLength({ min: 3, max: 200 }).withMessage('Titel moet tussen 3 en 200 karakters zijn')
-        .matches(/^[a-zA-Z0-9\s\-,.'éèêëàâäôöûüïî]+$/).withMessage('Titel mag alleen letters, cijfers en basis leestekens bevatten'),
+        .isLength({ min: 3, max: 200 }).withMessage('Titel moet tussen 3 en 200 karakters zijn'),
     
     body('description')
         .optional()
@@ -82,12 +76,10 @@ export const createRecipeValidation = [
 export const updateRecipeValidation = [
     param('id')
         .isInt({ min: 1 }).withMessage('Recipe ID moet een positief getal zijn'),
-    
-    body('title')
+      body('title')
         .optional()
         .trim()
-        .isLength({ min: 3, max: 200 }).withMessage('Titel moet tussen 3 en 200 karakters zijn')
-        .matches(/^[a-zA-Z0-9\s\-,.'éèêëàâäôöûüïî]+$/).withMessage('Titel mag alleen letters, cijfers en basis leestekens bevatten'),
+        .isLength({ min: 3, max: 200 }).withMessage('Titel moet tussen 3 en 200 karakters zijn'),
     
     body('description')
         .optional()
@@ -165,8 +157,12 @@ export const listRecipesValidation = [
     query('sort')
         .optional()
         .isIn(['title', 'prep_time', 'cook_time', 'created_at', 'servings', 'total_time']).withMessage('Sort veld is ongeldig'),
-    
-    query('order')
+      query('order')
         .optional()
         .isIn(['asc', 'desc']).withMessage('Order moet asc of desc zijn')
+];
+
+export const hardDeleteRecipeValidation = [
+    param('id')
+        .isInt({ min: 1 }).withMessage('Recipe ID moet een positief getal zijn')
 ];
